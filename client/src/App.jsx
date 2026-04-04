@@ -1,150 +1,119 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import Sidebar from './components/Sidebar';
-import WelcomeInfo from './components/WelcomeInfo';
+import Topbar from './components/Topbar';
+import StatCards from './components/StatCards';
 import TransactionForm from './components/TransactionForm';
 import TransactionTable from './components/TransactionTable';
-import StatCards from './components/StatCards';
+import WelcomeInfo from './components/WelcomeInfo';
 import AuditLogView from './components/AuditLogView';
-import AccessDenied from './components/AccessDenied';
 import TeamManagement from './components/TeamManagement';
-import { IconShield, IconAudit } from './Icons';
 
 const API_BASE = 'http://localhost:5005/api/v1';
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
+  const getStoredUser = () => {
+    try {
+      const stored = localStorage.getItem('user');
+      return (stored && stored !== 'undefined') ? JSON.parse(stored) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const [user, setUser] = useState(getStoredUser());
   const [activeTab, setActiveTab] = useState('welcome');
-  
-  // Data States
   const [records, setRecords] = useState([]);
   const [summary, setSummary] = useState({ total_income: 0, total_expense: 0, net_balance: 0 });
   const [auditLogs, setAuditLogs] = useState([]);
-  const [teamMembers, setTeamMembers] = useState([]);
-  
-  // Form States
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [organizationName, setOrganizationName] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [authError, setAuthError] = useState('');
-  const [formData, setFormData] = useState({
-    amount: '',
-    type: 'expense',
-    category: 'General',
-    date: new Date().toISOString().split('T')[0],
-    notes: ''
+  const [formData, setFormData] = useState({ date: new Date().toISOString().split('T')[0], category: 'General', type: 'expense', amount: '', notes: '' });
+  const [authForm, setAuthForm] = useState({ 
+    username: '', 
+    email: '', 
+    password: '', 
+    organization: 'Zorvyn Headquarters', 
+    role: 'Admin' 
   });
+  const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState('');
 
   const fetchData = useCallback(async () => {
     if (!token) return;
     try {
       const headers = { 'Authorization': `Bearer ${token}` };
       
-      // Fetch Dashboard
-      const dashRes = await fetch(`${API_BASE}/records/dashboard`, { headers });
-      const dashData = await dashRes.json();
-      if (dashData.status === 'success') setSummary(dashData.data.summary);
-
-      // Fetch Records
       const recRes = await fetch(`${API_BASE}/records`, { headers });
+      const sumRes = await fetch(`${API_BASE}/records/summary`, { headers });
+
       const recData = await recRes.json();
-      if (recData.status === 'success') setRecords(recData.data);
+      const sumData = await sumRes.json();
 
-      // Fetch Audit Logs (If permitted)
-      if (['Super Admin', 'Admin', 'Auditor'].includes(user.role)) {
-        const auditRes = await fetch(`${API_BASE}/records/audit-logs`, { headers });
-        const auditData = await auditRes.json();
-        if (auditData.status === 'success') setAuditLogs(auditData.data);
+      if (recRes.ok && Array.isArray(recData.data)) {
+        setRecords(recData.data);
       }
-
-      // Fetch Team Members (If permitted)
-      if (['Super Admin', 'Admin'].includes(user.role)) {
-        const teamRes = await fetch(`${API_BASE}/auth/team`, { headers });
-        const teamData = await teamRes.json();
-        if (teamData.status === 'success') setTeamMembers(teamData.data);
+      if (sumRes.ok && sumData.data && sumData.data.summary) {
+        setSummary(sumData.data.summary);
       }
     } catch (err) {
-      console.error('Fetch error:', err);
+      console.error(err);
+      if (err.status === 401) handleLogout();
+    }
+  }, [token]);
+
+  const fetchAuditLogs = useCallback(async () => {
+    if (!token || !['Super Admin', 'Admin', 'Auditor'].includes(user?.role)) return;
+    try {
+      const res = await fetch(`${API_BASE}/audit/logs`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const resData = await res.json();
+      if (res.ok && Array.isArray(resData.data)) {
+        setAuditLogs(resData.data);
+      }
+    } catch (err) {
+      console.error(err);
     }
   }, [token, user]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (token) {
+      fetchData();
+      fetchAuditLogs();
+    }
+  }, [token, activeTab, fetchData, fetchAuditLogs]);
 
-  const handleLogin = async (e) => {
+  const handleAuth = async (e) => {
     e.preventDefault();
-    setAuthError('');
+    setError('');
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const endpoint = isLogin ? 'login' : 'register';
+      const body = isLogin 
+        ? { email: authForm.email, password: authForm.password }
+        : { 
+            username: authForm.username, 
+            email: authForm.email, 
+            password: authForm.password, 
+            organizationName: authForm.organization,
+            role: authForm.role 
+          };
+
+      const res = await fetch(`${API_BASE}/auth/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify(body)
       });
       const data = await res.json();
-      if (data.status === 'success') {
-        localStorage.setItem('token', data.data.token);
-        localStorage.setItem('user', JSON.stringify({
-          username: data.data.username,
-          role: data.data.role,
-          organization: data.data.organization || 'Internal'
-        }));
-        setToken(data.data.token);
-        setUser({
-          username: data.data.username,
-          role: data.data.role,
-          organization: data.data.organization || 'Internal'
-        });
-        setActiveTab('overview');
-      } else {
-        setAuthError(data.message || 'Login failed');
-      }
-    } catch (err) {
-      setAuthError('Server error. Please check if backend is running.');
-    }
-  };
+      
+      if (!res.ok) throw new Error(data.error || 'Authentication failed');
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setAuthError('');
-    try {
-      const res = await fetch(`${API_BASE}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: email.split('@')[0], email, password, organizationName })
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setIsRegistering(false);
-        setAuthError('Registration successful! Please login.');
-      } else {
-        setAuthError(data.message || 'Registration failed');
-      }
+      const userData = data.data;
+      localStorage.setItem('token', userData.token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setToken(userData.token);
+      setUser(userData);
     } catch (err) {
-      setAuthError('Server error.');
-    }
-  };
-
-  const handleCreateTeamMember = async (memberData) => {
-    try {
-      const res = await fetch(`${API_BASE}/auth/team`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(memberData)
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        fetchData();
-      } else {
-        alert(data.message);
-      }
-    } catch (err) {
-      console.error(err);
+      setError(err.message);
     }
   };
 
@@ -156,8 +125,9 @@ function App() {
     setActiveTab('welcome');
   };
 
-  const handleCreate = async (e) => {
+  const handleAddTransaction = async (e) => {
     e.preventDefault();
+    setError('');
     try {
       const res = await fetch(`${API_BASE}/records`, {
         method: 'POST',
@@ -167,213 +137,185 @@ function App() {
         },
         body: JSON.stringify(formData)
       });
-      if (res.ok) {
-        setFormData({ ...formData, amount: '', notes: '' });
-        fetchData();
+      
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to record transaction');
       }
+
+      setFormData({ date: new Date().toISOString().split('T')[0], category: 'General', type: 'expense', amount: '', notes: '' });
+      fetchData();
     } catch (err) {
-      console.error(err);
+      setError(err.message);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this record?')) return;
+  const handleDeleteTransaction = async (id) => {
     try {
       const res = await fetch(`${API_BASE}/records/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (res.ok) fetchData();
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error);
+      }
+      fetchData();
     } catch (err) {
-      console.error(err);
+      setError(`Permission Denied: ${err.message}`);
     }
   };
 
-  // Integrated View Logic
+  if (!token) {
+    return (
+      <div className="landing-grid">
+        <div style={{padding: '4rem', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+          <h1 style={{fontSize: '3rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.03em'}}>Zorvyn Finance</h1>
+          <p style={{fontSize: '1.1rem', color: '#666', maxWidth: '500px', marginBottom: '2rem'}}>
+            Secure, enterprise-grade multi-tenant financial ledger. Strict role-based access control and comprehensive audit transparency.
+          </p>
+          
+          <div className="access-matrix">
+            <div className="matrix-tile">
+              <h5>Administrator</h5>
+              <p>Full control over teams and financial auditing.</p>
+              <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
+                ID: <strong>superadmin@zorvyn.com</strong> | PW: <strong>password123</strong>
+              </div>
+            </div>
+            <div className="matrix-tile">
+              <h5>Accountant</h5>
+              <p>Execute and manage fiscal records and journals.</p>
+              <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
+                ID: <strong>accountant@zorvyn.com</strong> | PW: <strong>password123</strong>
+              </div>
+            </div>
+            <div className="matrix-tile">
+              <h5>Auditor</h5>
+              <p>Read-only access to complete system audit trails.</p>
+              <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
+                ID: <strong>auditor@zorvyn.com</strong> | PW: <strong>password123</strong>
+              </div>
+            </div>
+            <div className="matrix-tile">
+              <h5>Viewer</h5>
+              <p>High-level operational overview and summaries.</p>
+              <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
+                ID: <strong>viewer@zorvyn.com</strong> | PW: <strong>password123</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="login-section">
+          <div className="card-container" style={{width: '100%', maxWidth: '380px'}}>
+            <h3 style={{marginBottom: '0.5rem'}}>{isLogin ? 'Authentication' : 'Registration'}</h3>
+            <p style={{fontSize: '0.8rem', color: '#888', marginBottom: '2rem'}}>Identify your tenant and credentials.</p>
+            
+            {error && <div className="rbac-denied" style={{marginBottom: '1.5rem'}}>{error}</div>}
+            
+            <form onSubmit={handleAuth} className="minimal-form">
+              <label>Identity Email</label>
+              <input type="email" value={authForm.email} onChange={e => setAuthForm({...authForm, email: e.target.value})} required />
+              
+              <label>Secure Access Password</label>
+              <input type="password" value={authForm.password} onChange={e => setAuthForm({...authForm, password: e.target.value})} required />
+              
+              {!isLogin && (
+                <>
+                  <label>Identifier ID (Username)</label>
+                  <input type="text" value={authForm.username} onChange={e => setAuthForm({...authForm, username: e.target.value})} required />
+                  
+                  <label>Organization Domain</label>
+                  <input type="text" value={authForm.organization} onChange={e => setAuthForm({...authForm, organization: e.target.value})} required />
+                </>
+              )}
+              
+              <button type="submit" className="btn-primary" style={{width: '100%'}}>
+                {isLogin ? 'Sign In' : 'Create Account'}
+              </button>
+            </form>
+            
+            <button className="menu-item" style={{width: '100%', marginTop: '1.5rem', textAlign: 'center', fontSize: '0.8rem'}} onClick={() => setIsLogin(!isLogin)}>
+              {isLogin ? "Need a new workspace? Register here." : "Already have an account? Sign in."}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-layout">
-      {token && (
-        <Sidebar 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          user={user} 
-          onLogout={handleLogout} 
-        />
-      )}
-
-      <main className="main-content-view">
-        {/* ELITE LANDING PAGE: 2-PANEL SPLIT */}
-        {(!token || activeTab === 'welcome') && (
-          <div className="landing-split-container">
-            <div className="landing-left-panel">
-              <WelcomeInfo />
-            </div>
-            
-            <div className="landing-right-panel">
-              {!token ? (
-                <div className="auth-portal-card">
-                  <div style={{textAlign: 'center', marginBottom: '2rem'}}>
-                    <h2 style={{fontSize: '2rem', marginBottom: '0.5rem'}}>
-                      {isRegistering ? 'Create Workspace' : 'Control Portal'}
-                    </h2>
-                    <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem'}}>
-                      {isRegistering 
-                        ? 'Boot a and new private organization instance.' 
-                        : 'Enter credentials for secure instance access.'}
-                    </p>
-                  </div>
-
-                  <form onSubmit={isRegistering ? handleRegister : handleLogin}>
-                    {isRegistering && (
-                      <input 
-                        className="input-stealth"
-                        type="text" 
-                        placeholder="Organization Name" 
-                        value={organizationName} 
-                        onChange={e => setOrganizationName(e.target.value)} 
-                        required
-                      />
-                    )}
-                    <input 
-                      className="input-stealth"
-                      type="email" 
-                      placeholder="Identifer (Email)" 
-                      value={email} 
-                      onChange={e => setEmail(e.target.value)} 
-                      required
-                    />
-                    <input 
-                      className="input-stealth"
-                      type="password" 
-                      placeholder="Access Code (Password)" 
-                      value={password} 
-                      onChange={e => setPassword(e.target.value)} 
-                      required
-                    />
-                    <button type="submit" className="btn-elite">
-                      {isRegistering ? 'INITIALIZE WORKSPACE' : 'AUTHENTICATE'}
-                    </button>
-                  </form>
-                  
-                  {authError && <p className="warning-text" style={{marginTop: '20px', textAlign: 'center', color: 'var(--error)'}}>{authError}</p>}
-                  
-                  <div style={{marginTop: '2rem', textAlign: 'center'}}>
-                    <button className="btn-link" style={{color: 'var(--text-muted)', fontSize: '0.85rem'}} onClick={() => setIsRegistering(!isRegistering)}>
-                      {isRegistering ? 'Existing Operator? Access Portal' : 'New Client? Request Instance'}
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                  <div className="auth-portal-card" style={{textAlign: 'center'}}>
-                     <div style={{color: 'var(--primary)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'center'}}>
-                       <IconShield size={64} />
-                     </div>
-                     <h3>{user.organization}</h3>
-                     <p style={{color: 'var(--text-secondary)', marginBottom: '2rem'}}>Connected as <strong>{user.username}</strong></p>
-                     <button className="btn-elite" onClick={() => setActiveTab('overview')}>ENTER DASHBOARD</button>
-                  </div>
-              )}
-            </div>
-          </div>
-        )}
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        user={user} 
+        onLogout={handleLogout} 
+      />
+      
+      <div className="main-wrapper">
+        <Topbar user={user} />
         
-        {token && activeTab === 'overview' && (
-          <div className="dashboard-content">
-            <StatCards summary={summary} />
-            <div className={`dashboard-grid ${!['Super Admin', 'Admin', 'Accountant'].includes(user.role) ? 'no-sidebar' : ''}`}>
-              {['Super Admin', 'Admin', 'Accountant'].includes(user.role) && (
-                 <TransactionForm 
-                   formData={formData} 
-                   setFormData={setFormData} 
-                   onSubmit={handleCreate} 
-                 />
-              )}
-                <div className={`card-container ${!['Super Admin', 'Admin', 'Accountant'].includes(user.role) ? 'full-width' : ''}`}>
-                  <header style={{display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem'}}>
-                     <h3>LATEST LEDGER ACTIVITY</h3>
-                     <small className="text-muted">SYNCED LIVE</small>
+        <main className="content-area">
+          {error && <div className="rbac-denied">{error}</div>}
+
+          {activeTab === 'welcome' && <WelcomeInfo user={user} />}
+          
+          {activeTab === 'overview' && (
+            <div>
+              <header className="section-header">
+                <h3>Financial Dashboard</h3>
+              </header>
+              <StatCards summary={summary} />
+              
+              <div className="dashboard-grid">
+                <TransactionForm 
+                  formData={formData} 
+                  setFormData={setFormData} 
+                  onSubmit={handleAddTransaction} 
+                  userRole={user?.role}
+                />
+                
+                <div className="card-container">
+                  <header className="section-header">
+                    <h3>Journal Entries</h3>
                   </header>
-                  {records.length > 0 ? (
-                    <TransactionTable 
-                      records={records.slice(0, 5)} 
-                      onDelete={handleDelete} 
-                      userRole={user.role} 
-                    />
-                  ) : (
-                    <div className="empty-state">
-                      <div className="empty-state-icon" style={{color: 'var(--primary)'}}>
-                        <IconAudit size={48} />
-                      </div>
-                      <h4>Ledger is currently empty</h4>
-                      <p>
-                        {['Super Admin', 'Admin', 'Accountant'].includes(user.role) 
-                          ? 'Start by recording a transaction using the terminal on the left.'
-                          : 'Administrative clearance required to initialize new records.'}
-                      </p>
-                    </div>
-                  )}
-               </div>
+                  <TransactionTable 
+                    records={records} 
+                    onDelete={handleDeleteTransaction} 
+                    userRole={user?.role} 
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {token && activeTab === 'transactions' && (
-          <div className="transactions-view">
+          {activeTab === 'transactions' && (
+            <div className="card-container">
+              <header className="section-header">
+                <h3>Master Journal</h3>
+              </header>
+              <TransactionTable 
+                records={records} 
+                onDelete={handleDeleteTransaction} 
+                userRole={user?.role} 
+              />
+            </div>
+          )}
+
+          {activeTab === 'activity' && (
              <div className="card-container">
-                <header style={{display: 'flex', justifyContent: 'space-between', marginBottom: '2rem'}}>
-                   <h3>FULL TRANSACTION ARCHIVE</h3>
-                   <button className="btn-elite" style={{padding: '8px 20px', fontSize: '0.8rem'}} onClick={() => setActiveTab('overview')}>+ NEW RECORD</button>
-                </header>
-                {records.length > 0 ? (
-                  <TransactionTable records={records} onDelete={handleDelete} userRole={user.role} />
-                ) : (
-                  <div className="empty-state">
-                    <div className="empty-state-icon" style={{color: 'var(--text-muted)'}}>
-                      <IconAudit size={48} />
-                    </div>
-                    <h4>No data points available</h4>
-                    <p>Once you initialize your first record, it will be archived here.</p>
-                  </div>
-                )}
-             </div>
-          </div>
-        )}
-
-        {token && activeTab === 'activity' && (
-          <div className="audit-view">
-             <div className="card-container">
-                {['Super Admin', 'Admin', 'Auditor'].includes(user.role) 
-                  ? (
-                    <>
-                      <header style={{marginBottom: '20px'}}>
-                        <h3>System Transparency</h3>
-                        <p className="text-muted small">Every write/delete action is logged here for 100% audit compliance.</p>
-                      </header>
-                      <AuditLogView auditLogs={auditLogs} />
-                    </>
-                  )
-                  : <AccessDenied message="Only Administrators and Auditors can view system logs." />
-                }
-             </div>
-          </div>
-        )}
-
-        {token && activeTab === 'team' && (
-          <div className="team-view">
-              {['Super Admin', 'Admin'].includes(user.role) 
-                ? <TeamManagement teamMembers={teamMembers} onCreateMember={handleCreateTeamMember} />
-                : <AccessDenied message="Only Workspace Admins can manage the team." />
-              }
-          </div>
-        )}
-
-        {!token && activeTab !== 'welcome' && (
-          <div className="card-container">
-             <p>Please login from the Home page to access this feature.</p>
-             <button className="btn btn-primary" onClick={() => setActiveTab('welcome')}>Back to Home</button>
-          </div>
-        )}
-      </main>
+              <header className="section-header">
+               <h3>Audit Trail</h3>
+             </header>
+             <AuditLogView auditLogs={auditLogs} userRole={user?.role} />
+           </div>
+          )}
+          
+          {activeTab === 'team' && <TeamManagement user={user} token={token} />}
+        </main>
+      </div>
     </div>
   );
 }

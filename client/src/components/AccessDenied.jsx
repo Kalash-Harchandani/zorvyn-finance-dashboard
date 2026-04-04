@@ -1,15 +1,19 @@
 import React from 'react';
-import { IconLock } from './Icons';
 
 const AccessDenied = ({ message }) => {
   return (
-    <div className="empty-state">
-      <div className="empty-state-icon" style={{color: 'var(--error)'}}>
-        <IconLock size={48} />
+    <div className="card-container" style={{borderColor: 'var(--error)'}}>
+      <div className="rbac-denied" style={{textAlign: 'center', padding: '3rem'}}>
+        <h1 style={{fontSize: '0.75rem', letterSpacing: '0.5em', marginBottom: '2rem', color: 'var(--error)'}}>
+          AUTHORITY_REQUIRED
+        </h1>
+        <p style={{fontSize: '0.9rem', color: 'var(--text-main)', maxWidth: '400px', margin: '0 auto'}}>
+          {message || "Your current security token lacks the necessary clearance level to view this module."}
+        </p>
+        <div style={{marginTop: '2rem', fontSize: '0.7rem', color: '#999'}}>
+          ERR_CODE: 403_FORBIDDEN_RESOURCE
+        </div>
       </div>
-      <h4>Access Permission Denied</h4>
-      <p>{message || "You do not have the required clearance level to access this organizational asset."}</p>
-      <div className="access-denied-hint">Contact a Super Admin if you believe this is an error.</div>
     </div>
   );
 };

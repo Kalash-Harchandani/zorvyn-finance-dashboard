@@ -1,99 +1,27 @@
 import React from 'react';
-import { 
-  IconShield, 
-  IconAudit, 
-  IconTransactions, 
-  IconTeam, 
-  IconDashboard 
-} from './Icons';
 
-const WelcomeInfo = () => {
-  const accessTiers = [
-    { 
-      role: 'Admin', 
-      Icon: IconTeam, 
-      class: 'admin', 
-      scope: [
-        'Create and manage teams',
-        'Full access to all financial data',
-        'Add and delete financial records'
-      ], 
-      email: 'superadmin@zorvyn.com' 
-    },
-    { 
-      role: 'Accountant', 
-      Icon: IconTransactions, 
-      class: 'accountant', 
-      scope: [
-        'Add financial records',
-        'Cannot delete existing entries'
-      ], 
-      email: 'accountant@zorvyn.com' 
-    },
-    { 
-      role: 'Auditor', 
-      Icon: IconAudit, 
-      class: 'auditor', 
-      scope: [
-        'Read-only access to all financial data',
-        'Cannot create, update, or delete records'
-      ], 
-      email: 'auditor@zorvyn.com' 
-    },
-    { 
-      role: 'Viewer', 
-      Icon: IconDashboard, 
-      class: 'viewer', 
-      scope: [
-        'View income and expense summaries',
-        'No access to transaction history'
-      ], 
-      email: 'viewer@zorvyn.com' 
-    },
-  ];
-
+const WelcomeInfo = ({ user }) => {
   return (
-    <div className="landing-info-vertical">
-      <div className="workspace-badge" style={{marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
-         <IconShield size={14} /> ISOLATED ARCHITECTURE ACTIVE
-      </div>
-      
-      <h1 style={{fontSize: '4.8rem', fontWeight: '800', lineHeight: '0.85', marginBottom: '2.5rem', letterSpacing: '-0.04em'}}>
-        Absolute Data <br/><span className="text-primary" style={{textShadow: '0 0 50px var(--primary-glow)'}}>Integrity.</span>
-      </h1>
-      
-      <p style={{fontSize: '1.2rem', color: 'var(--text-dim)', marginBottom: '3.5rem', maxWidth: '580px', fontWeight: '400', lineHeight: '1.6'}}>
-        A high-fidelity multi-tenant console engineered for absolute data silo compliance and role-based operational precision.
-      </p>
+    <div className="card-container">
+      <header className="section-header">
+        <h3>Operational Onboarding</h3>
+        <span className="badge badge-income">Security Clearance: {user?.role}</span>
+      </header>
 
-      <div className="credentials-section">
-        <h4 style={{fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.35em', color: 'var(--primary)', fontWeight: '800', marginBottom: '1.5rem'}}>
-           SYSTEM ACCESS HIERARCHY
-        </h4>
-        
-        <div className="access-grid">
-          {accessTiers.map((tier) => (
-            <div key={tier.role} className={`access-tile ${tier.class}`}>
-              <div className="tile-header">
-                <div className="tile-icon" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <tier.Icon size={16} />
-                </div>
-                <div style={{fontSize: '1.1rem'}}>{tier.role}</div>
-              </div>
-              <ul style={{listStyle: 'none', padding: '0', margin: '0', display: 'flex', flexDirection: 'column', gap: '4px'}}>
-                {tier.scope.map((item, i) => (
-                  <li key={i} style={{fontSize: '0.75rem', color: 'var(--text-dim)', lineHeight: '1.4', display: 'flex', gap: '6px'}}>
-                    <span style={{color: 'var(--primary)'}}>•</span> {item}
-                  </li>
-                ))}
-              </ul>
-              <div className="tile-creds">
-                {tier.email} <span style={{color: 'var(--primary)', fontWeight: '700', marginLeft: '6px'}}>password123</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <section style={{marginBottom: '3rem'}}>
+        <h1 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>Welcome to Zorvyn.</h1>
+        <p style={{color: 'var(--text-dim)', maxWidth: '800px', fontSize: '1.1rem'}}>
+          You are currently authenticated within the <strong>{user?.organization}</strong> tenant. 
+          This dashboard provides a consolidated view of organizational fiscal health and audit transparency. 
+          Please review your role-based permissions below.
+        </p>
+      </section>
+
+      <footer style={{marginTop: '4rem', paddingTop: '2rem', borderTop: '1px solid var(--border-light)', display: 'flex', gap: '2rem', fontSize: '0.8rem', color: '#888'}}>
+        <div>PROTOCOL: <strong>ZORVYN-SEC-256</strong></div>
+        <div>TENANT_ID: <strong>{user?.tenant_id || 'LOCAL-01'}</strong></div>
+        <div>USER_ID: <strong>#{user?.id}</strong></div>
+      </footer>
     </div>
   );
 };

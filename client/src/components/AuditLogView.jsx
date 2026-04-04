@@ -1,51 +1,56 @@
 import React from 'react';
-import { IconAudit, IconPlus, IconTrash } from './Icons';
-import AccessDenied from './AccessDenied';
 
-const AuditLogView = ({ auditLogs }) => {
-  if (auditLogs.length > 0 && auditLogs[0].id === 'error') {
-    return <AccessDenied message="Only Auditors and Admins can view the system's full activity history." />;
+const AuditLogView = ({ auditLogs, userRole }) => {
+  if (!userRole) {
+    return (
+      <div className="card-container">
+        <div style={{color: '#888', fontStyle: 'italic'}}>Synchronizing security credentials...</div>
+      </div>
+    );
+  }
+
+  if (!['Super Admin', 'Admin', 'Auditor'].includes(userRole)) {
+    return (
+      <div className="card-container">
+        <div className="rbac-denied">
+          Insufficient authority to access system audit trails. 
+          Clearance Level: <strong>{userRole}</strong>
+        </div>
+      </div>
+    );
   }
 
   if (!auditLogs || auditLogs.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state-icon">
-          <IconAudit size={48} />
-        </div>
-        <h4>Audit Vault Empty</h4>
-        <p>System transparency logs will appear here as transactions are realized.</p>
+        <h4>Audit Trail Empty</h4>
+        <p>System activities will be logged here as they occur.</p>
       </div>
     );
   }
 
   return (
-    <div className="audit-container">
-      <header style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem'}}>
-        <IconAudit size={24} color="var(--primary)" />
-        <h3 style={{margin: 0}}>System Activity History</h3>
+    <div className="card-container">
+      <header className="section-header">
+        <h3>System Transparency Ledger</h3>
+        <span className="badge badge-income" style={{fontSize: '0.6rem'}}>Verifiable Records</span>
       </header>
+
       <div className="audit-list">
         {auditLogs.map((log) => (
-          <div key={log.id} className="audit-item" style={{display: 'flex', gap: '15px', padding: '12px 0', borderBottom: '1px solid var(--border-dim)'}}>
-            <div className="action-marker" style={{paddingTop: '4px'}}>
-              {log.action_type === 'CREATE' ? (
-                <IconPlus size={16} color="var(--success)" />
-              ) : log.action_type === 'DELETE' ? (
-                <IconTrash size={16} color="var(--error)" />
-              ) : (
-                <div style={{width: '16px', height: '16px', borderRadius: '50%', background: 'var(--primary)', opacity: 0.6}} />
-              )}
+          <div key={log.id} style={{padding: '1rem 0', borderBottom: '1px solid var(--border-light)', display: 'flex', gap: '1rem', alignItems: 'flex-start'}}>
+            <div style={{minWidth: '80px', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', color: log.action_type === 'DELETE' ? 'var(--error)' : 'var(--text-main)'}}>
+              [{log.action_type}]
             </div>
-            <div className="audit-details">
-              <div style={{fontSize: '0.9rem', marginBottom: '2px'}}>
-                <strong>{log.action_type}</strong> by <span>{log.username}</span>
+            <div>
+              <div style={{fontSize: '0.9rem', marginBottom: '4px'}}>
+                Executed by <strong>{log.username}</strong> on table <code>{log.target_table}</code>
               </div>
               <div style={{fontSize: '0.8rem', color: 'var(--text-dim)'}}>
-                Performed on <code>{log.target_table}</code>
-                {log.action_type === 'DELETE' && <span className="warning-text"> (Record Soft-Deleted)</span>}
+                {log.details || "System metadata update - No specific notes provided."}
+                {log.action_type === 'DELETE' && <span style={{color: 'var(--error)', marginLeft: '10px'}}>! PERMANENT DELETION</span>}
               </div>
-              <div style={{fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px'}}>
+              <div style={{fontSize: '0.7rem', color: '#999', marginTop: '4px'}}>
                 {new Date(log.timestamp).toLocaleString()}
               </div>
             </div>

@@ -1,74 +1,78 @@
 import React from 'react';
-import { IconPlus } from './Icons';
 
-const TransactionForm = ({ formData, setFormData, onSubmit }) => {
+const TransactionForm = ({ formData, setFormData, onSubmit, userRole }) => {
+  const isDisabled = ['Viewer', 'Auditor'].includes(userRole);
+
   return (
     <div className="card-container">
-      <header style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2rem'}}>
-        <IconPlus size={20} color="var(--primary)" />
-        <h3 style={{margin: 0}}>Record Transaction</h3>
+      <header className="section-header">
+        <h3>Record Entry</h3>
+        {isDisabled && <span className="badge badge-expense">READ-ONLY ACCESS</span>}
       </header>
-      <form onSubmit={onSubmit}>
-        <div className="form-group row">
-          <div className="input-group">
-            <label>Transaction Amount</label>
-            <div className="currency-input">
-              <span className="currency-symbol">$</span>
-              <input
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                required
-              />
-            </div>
+
+      {isDisabled && (
+        <div className="rbac-denied" style={{marginBottom: '1.5rem'}}>
+          Authority Level: <strong>{userRole}</strong>. Your account does not have write-clearance for the financial journal.
+        </div>
+      )}
+
+      <form onSubmit={onSubmit} className="minimal-form">
+        <label>Accounting Date</label>
+        <input 
+          type="date" 
+          value={formData.date} 
+          onChange={e => setFormData({...formData, date: e.target.value})} 
+          disabled={isDisabled}
+          required 
+        />
+
+        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+          <div>
+            <label>Category</label>
+            <input 
+              type="text" 
+              placeholder="e.g. Payroll" 
+              value={formData.category} 
+              onChange={e => setFormData({...formData, category: e.target.value})} 
+              disabled={isDisabled}
+              required 
+            />
           </div>
-          <div className="input-group">
-            <label>Operation Type</label>
-            <select
-              value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+          <div>
+            <label>Type</label>
+            <select 
+              value={formData.type} 
+              onChange={e => setFormData({...formData, type: e.target.value})}
+              disabled={isDisabled}
             >
-              <option value="expense">Expense</option>
               <option value="income">Income</option>
+              <option value="expense">Expense</option>
             </select>
           </div>
         </div>
 
-        <div className="form-group row">
-          <div className="input-group">
-            <label>Business Category</label>
-            <input
-              type="text"
-              placeholder="e.g. Salary, Operations"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              required
-            />
-          </div>
-          <div className="input-group">
-            <label>Accounting Date</label>
-            <input
-              type="date"
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              required
-            />
-          </div>
-        </div>
+        <label>Amount (USD)</label>
+        <input 
+          type="number" 
+          step="0.01"
+          placeholder="0.00" 
+          value={formData.amount} 
+          onChange={e => setFormData({...formData, amount: e.target.value})} 
+          disabled={isDisabled}
+          required 
+        />
 
-        <div className="form-group">
-          <label>Audit Notes (Optional)</label>
-          <textarea
-            rows="3"
-            placeholder="Provide context for this record..."
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          />
-        </div>
+        <label>Operational Notes</label>
+        <textarea 
+          placeholder="Optional metadata..." 
+          value={formData.notes} 
+          onChange={e => setFormData({...formData, notes: e.target.value})}
+          disabled={isDisabled}
+        />
 
-        <button type="submit" className="btn-elite btn-block">ADD TO LEDGER</button>
+        <button type="submit" className="btn-primary" style={{width: '100%'}} disabled={isDisabled}>
+          {isDisabled ? 'Submission Locked' : 'Execute Record'}
+        </button>
       </form>
     </div>
   );

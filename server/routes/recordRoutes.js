@@ -14,6 +14,7 @@ const router = express.Router();
 router.use(requireAuth);
 
 router.get('/dashboard', checkPermissions(['read:dashboard']), getDashboardSummary);
+router.get('/summary', checkPermissions(['read:dashboard']), getDashboardSummary);
 router.get('/audit-logs', checkPermissions(['read:audit_logs']), getAuditLogs);
 
 router.route('/')
