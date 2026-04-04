@@ -64,7 +64,7 @@ function App() {
   const fetchAuditLogs = useCallback(async () => {
     if (!token || !['Super Admin', 'Admin', 'Auditor'].includes(user?.role)) return;
     try {
-      const res = await fetch(`${API_BASE}/audit/logs`, {
+      const res = await fetch(`${API_BASE}/records/audit-logs`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const resData = await res.json();
