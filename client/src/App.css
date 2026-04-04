@@ -342,3 +342,80 @@ input:focus, select:focus, textarea:focus {
 .text-muted { color: var(--text-muted); }
 .text-primary { color: var(--primary); }
 .small { font-size: 0.8rem; }
+
+/* Elite Access Hierarchy Styles */
+.access-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+
+.access-tile {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-dim);
+  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.access-tile::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 4px; height: 100%;
+  opacity: 0.6;
+}
+
+.access-tile:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--primary-glow);
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+}
+
+.access-tile.admin::before { background: var(--primary); }
+.access-tile.auditor::before { background: var(--warning); }
+.access-tile.accountant::before { background: var(--success); }
+.access-tile.viewer::before { background: var(--text-muted); }
+
+.tile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: white;
+}
+
+.tile-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--bg-accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.tile-scope {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.tile-creds {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
