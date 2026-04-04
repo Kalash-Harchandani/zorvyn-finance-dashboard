@@ -1,7 +1,8 @@
 import React from 'react';
 import AccessDenied from './AccessDenied';
+import { IconTrash } from './Icons';
 
-const TransactionTable = ({ records, onDelete }) => {
+const TransactionTable = ({ records, onDelete, userRole }) => {
   if (records.length > 0 && records[0].id === 'error') {
     return <AccessDenied message={records[0].notes} />;
   }
@@ -19,7 +20,7 @@ const TransactionTable = ({ records, onDelete }) => {
             <th>Category</th>
             <th>Type</th>
             <th>Digital Amount</th>
-            <th style={{textAlign: 'right'}}>Actions</th>
+            {['Super Admin', 'Admin'].includes(userRole) && <th style={{textAlign: 'right'}}>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -35,16 +36,18 @@ const TransactionTable = ({ records, onDelete }) => {
               <td className="stat-value" style={{fontSize: '1rem', fontWeight: '700'}}>
                 ${Number(r.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </td>
-              <td style={{textAlign: 'right'}}>
-                <button 
-                  onClick={() => onDelete(r.id)} 
-                  className="logout-menu-item"
-                  style={{padding: '8px', marginTop: '0', display: 'inline-flex', width: 'auto'}}
-                  title="Purge Record"
-                >
-                  <span style={{fontSize: '1rem'}}>🗑️</span>
-                </button>
-              </td>
+              {['Super Admin', 'Admin'].includes(userRole) && (
+                <td style={{textAlign: 'right'}}>
+                  <button 
+                    onClick={() => onDelete(r.id)} 
+                    className="logout-menu-item"
+                    style={{padding: '8px', marginTop: '0', display: 'inline-flex', width: 'auto', color: 'var(--error)'}}
+                    title="Purge Record"
+                  >
+                    <IconTrash size={16} />
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

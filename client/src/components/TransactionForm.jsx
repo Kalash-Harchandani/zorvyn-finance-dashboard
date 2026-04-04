@@ -1,9 +1,13 @@
 import React from 'react';
+import { IconPlus } from './Icons';
 
 const TransactionForm = ({ formData, setFormData, onSubmit }) => {
   return (
     <div className="card-container">
-      <h3 style={{marginBottom: '2rem'}}>➕ Record Transaction</h3>
+      <header style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2rem'}}>
+        <IconPlus size={20} color="var(--primary)" />
+        <h3 style={{margin: 0}}>Record Transaction</h3>
+      </header>
       <form onSubmit={onSubmit}>
         <div className="form-group row">
           <div className="input-group">

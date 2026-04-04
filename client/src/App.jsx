@@ -8,6 +8,7 @@ import StatCards from './components/StatCards';
 import AuditLogView from './components/AuditLogView';
 import AccessDenied from './components/AccessDenied';
 import TeamManagement from './components/TeamManagement';
+import { IconShield, IconAudit } from './Icons';
 
 const API_BASE = 'http://localhost:5005/api/v1';
 
@@ -263,12 +264,14 @@ function App() {
                   </div>
                 </div>
               ) : (
-                <div className="auth-portal-card" style={{textAlign: 'center'}}>
-                   <div style={{fontSize: '3rem', marginBottom: '1rem'}}>🏢</div>
-                   <h3>{user.organization}</h3>
-                   <p style={{color: 'var(--text-secondary)', marginBottom: '2rem'}}>Connected as <strong>{user.username}</strong></p>
-                   <button className="btn-elite" onClick={() => setActiveTab('overview')}>ENTER DASHBOARD</button>
-                </div>
+                  <div className="auth-portal-card" style={{textAlign: 'center'}}>
+                     <div style={{color: 'var(--primary)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'center'}}>
+                       <IconShield size={64} />
+                     </div>
+                     <h3>{user.organization}</h3>
+                     <p style={{color: 'var(--text-secondary)', marginBottom: '2rem'}}>Connected as <strong>{user.username}</strong></p>
+                     <button className="btn-elite" onClick={() => setActiveTab('overview')}>ENTER DASHBOARD</button>
+                  </div>
               )}
             </div>
           </div>
@@ -277,24 +280,36 @@ function App() {
         {token && activeTab === 'overview' && (
           <div className="dashboard-content">
             <StatCards summary={summary} />
-            <div className="dashboard-grid">
-               <TransactionForm 
-                 formData={formData} 
-                 setFormData={setFormData} 
-                 onSubmit={handleCreate} 
-               />
-                <div className="card-container">
+            <div className={`dashboard-grid ${!['Super Admin', 'Admin', 'Accountant'].includes(user.role) ? 'no-sidebar' : ''}`}>
+              {['Super Admin', 'Admin', 'Accountant'].includes(user.role) && (
+                 <TransactionForm 
+                   formData={formData} 
+                   setFormData={setFormData} 
+                   onSubmit={handleCreate} 
+                 />
+              )}
+                <div className={`card-container ${!['Super Admin', 'Admin', 'Accountant'].includes(user.role) ? 'full-width' : ''}`}>
                   <header style={{display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem'}}>
                      <h3>LATEST LEDGER ACTIVITY</h3>
                      <small className="text-muted">SYNCED LIVE</small>
                   </header>
                   {records.length > 0 ? (
-                    <TransactionTable records={records.slice(0, 5)} onDelete={handleDelete} />
+                    <TransactionTable 
+                      records={records.slice(0, 5)} 
+                      onDelete={handleDelete} 
+                      userRole={user.role} 
+                    />
                   ) : (
                     <div className="empty-state">
-                      <div className="empty-state-icon">📝</div>
+                      <div className="empty-state-icon" style={{color: 'var(--primary)'}}>
+                        <IconAudit size={48} />
+                      </div>
                       <h4>Ledger is currently empty</h4>
-                      <p>Start by recording a transaction using the terminal on the left.</p>
+                      <p>
+                        {['Super Admin', 'Admin', 'Accountant'].includes(user.role) 
+                          ? 'Start by recording a transaction using the terminal on the left.'
+                          : 'Administrative clearance required to initialize new records.'}
+                      </p>
                     </div>
                   )}
                </div>
@@ -310,10 +325,12 @@ function App() {
                    <button className="btn-elite" style={{padding: '8px 20px', fontSize: '0.8rem'}} onClick={() => setActiveTab('overview')}>+ NEW RECORD</button>
                 </header>
                 {records.length > 0 ? (
-                  <TransactionTable records={records} onDelete={handleDelete} />
+                  <TransactionTable records={records} onDelete={handleDelete} userRole={user.role} />
                 ) : (
                   <div className="empty-state">
-                    <div className="empty-state-icon">📂</div>
+                    <div className="empty-state-icon" style={{color: 'var(--text-muted)'}}>
+                      <IconAudit size={48} />
+                    </div>
                     <h4>No data points available</h4>
                     <p>Once you initialize your first record, it will be archived here.</p>
                   </div>

@@ -339,9 +339,15 @@ input:focus, select:focus, textarea:focus {
 .main-content-view > div { animation: fadeInSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 
 /* Utility */
-.text-muted { color: var(--text-muted); }
-.text-primary { color: var(--primary); }
-.small { font-size: 0.8rem; }
+/* RBAC Layout Helpers */
+.dashboard-grid.no-sidebar {
+  grid-template-columns: 1fr;
+}
+
+.card-container.full-width {
+  max-width: 1000px;
+  margin: 0 auto;
+}
 
 /* Elite Access Hierarchy Styles */
 .access-grid {

@@ -1,8 +1,17 @@
+import React from 'react';
+import { 
+  IconShield, 
+  IconAudit, 
+  IconTransactions, 
+  IconTeam, 
+  IconDashboard 
+} from './Icons';
+
 const WelcomeInfo = () => {
   const accessTiers = [
     { 
       role: 'Admin', 
-      icon: '🛡️', 
+      Icon: IconTeam, 
       class: 'admin', 
       scope: [
         'Create and manage teams',
@@ -13,7 +22,7 @@ const WelcomeInfo = () => {
     },
     { 
       role: 'Accountant', 
-      icon: '📊', 
+      Icon: IconTransactions, 
       class: 'accountant', 
       scope: [
         'Add financial records',
@@ -23,7 +32,7 @@ const WelcomeInfo = () => {
     },
     { 
       role: 'Auditor', 
-      icon: '⚖️', 
+      Icon: IconAudit, 
       class: 'auditor', 
       scope: [
         'Read-only access to all financial data',
@@ -33,7 +42,7 @@ const WelcomeInfo = () => {
     },
     { 
       role: 'Viewer', 
-      icon: '👁️', 
+      Icon: IconDashboard, 
       class: 'viewer', 
       scope: [
         'View income and expense summaries',
@@ -45,8 +54,8 @@ const WelcomeInfo = () => {
 
   return (
     <div className="landing-info-vertical">
-      <div className="workspace-badge" style={{marginBottom: '2rem'}}>
-         🔐 ISOLATED ARCHITECTURE ACTIVE
+      <div className="workspace-badge" style={{marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
+         <IconShield size={14} /> ISOLATED ARCHITECTURE ACTIVE
       </div>
       
       <h1 style={{fontSize: '4.8rem', fontWeight: '800', lineHeight: '0.85', marginBottom: '2.5rem', letterSpacing: '-0.04em'}}>
@@ -66,13 +75,15 @@ const WelcomeInfo = () => {
           {accessTiers.map((tier) => (
             <div key={tier.role} className={`access-tile ${tier.class}`}>
               <div className="tile-header">
-                <div className="tile-icon">{tier.icon}</div>
+                <div className="tile-icon" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  <tier.Icon size={16} />
+                </div>
                 <div style={{fontSize: '1.1rem'}}>{tier.role}</div>
               </div>
               <ul style={{listStyle: 'none', padding: '0', margin: '0', display: 'flex', flexDirection: 'column', gap: '4px'}}>
                 {tier.scope.map((item, i) => (
-                  <li key={i} style={{fontSize: '0.75rem', color: 'var(--text-dim)', lineHeight: '1.4'}}>
-                    • {item}
+                  <li key={i} style={{fontSize: '0.75rem', color: 'var(--text-dim)', lineHeight: '1.4', display: 'flex', gap: '6px'}}>
+                    <span style={{color: 'var(--primary)'}}>•</span> {item}
                   </li>
                 ))}
               </ul>

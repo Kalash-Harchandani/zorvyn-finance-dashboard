@@ -1,12 +1,20 @@
 import React from 'react';
+import { 
+  IconDashboard, 
+  IconTransactions, 
+  IconAudit, 
+  IconTeam, 
+  IconWelcome, 
+  IconLogout 
+} from './Icons';
 
 const Sidebar = ({ activeTab, setActiveTab, user, onLogout }) => {
   const tabs = [
-    { id: 'welcome', label: 'Welcome Guide', icon: '🏠' },
-    { id: 'overview', label: 'Dashboard', icon: '📊' },
-    { id: 'transactions', label: 'Transactions', icon: '💸' },
-    { id: 'activity', label: 'Audit Logs', icon: '📑' },
-    { id: 'team', label: 'Team', icon: '👥' },
+    { id: 'welcome', label: 'Welcome Guide', Icon: IconWelcome },
+    { id: 'overview', label: 'Dashboard', Icon: IconDashboard },
+    { id: 'transactions', label: 'Transactions', Icon: IconTransactions },
+    { id: 'activity', label: 'Audit Logs', Icon: IconAudit },
+    { id: 'team', label: 'Team', Icon: IconTeam },
   ];
 
   return (
@@ -29,8 +37,10 @@ const Sidebar = ({ activeTab, setActiveTab, user, onLogout }) => {
 
       <nav className="sidebar-menu">
         {tabs.map((tab) => {
+          // RBAC Filtering
           if (tab.id === 'team' && !['Super Admin', 'Admin'].includes(user.role)) return null;
           if (tab.id === 'activity' && !['Super Admin', 'Admin', 'Auditor'].includes(user.role)) return null;
+          if (tab.id === 'transactions' && user.role === 'Viewer') return null;
           
           return (
             <button
@@ -38,7 +48,9 @@ const Sidebar = ({ activeTab, setActiveTab, user, onLogout }) => {
               className={`menu-item ${activeTab === tab.id ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <span className="icon-box" style={{fontSize: '1.2rem'}}>{tab.icon}</span>
+              <span className="icon-box" style={{fontSize: '1.2rem', display: 'flex', alignItems: 'center'}}>
+                <tab.Icon size={20} />
+              </span>
               <span className="label">{tab.label}</span>
             </button>
           );
@@ -46,7 +58,9 @@ const Sidebar = ({ activeTab, setActiveTab, user, onLogout }) => {
       </nav>
 
       <button className="logout-menu-item" onClick={onLogout}>
-        <span className="icon-box" style={{fontSize: '1.2rem'}}>🚪</span>
+        <span className="icon-box" style={{fontSize: '1.2rem', display: 'flex', alignItems: 'center'}}>
+          <IconLogout size={20} />
+        </span>
         <span className="label">Terminate Session</span>
       </button>
     </div>
