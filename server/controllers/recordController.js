@@ -116,3 +116,20 @@ export const getDashboardSummary = asyncHandler(async (req, res, next) => {
     }
   });
 });
+
+// @desc    Get audit logs
+// @route   GET /api/v1/records/audit-logs
+export const getAuditLogs = asyncHandler(async (req, res, next) => {
+  const [rows] = await db.query(`
+    SELECT a.*, u.username 
+    FROM audit_logs a
+    LEFT JOIN users u ON a.user_id = u.id
+    ORDER BY a.timestamp DESC
+    LIMIT 50
+  `);
+
+  res.json({
+    status: 'success',
+    data: rows
+  });
+});

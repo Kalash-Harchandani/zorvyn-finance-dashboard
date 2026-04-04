@@ -144,6 +144,38 @@ header {
   background: #c82333;
 }
 
+.audit-section {
+  margin-top: 40px;
+  border-top: 2px solid #eee;
+  padding-top: 20px;
+}
+
+.audit-list {
+  list-style: none;
+  padding: 0;
+  background: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.audit-list li {
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+.audit-list li:last-child {
+  border-bottom: none;
+}
+
+.info-box {
+  background: #e2f3f5;
+  color: #0e7088;
+  padding: 15px;
+  border-radius: 4px;
+  border: 1px solid #bee5eb;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

@@ -163,17 +163,25 @@ const initDb = async () => {
     console.log('✅ Role-Permission mappings seeded');
 
     // Also Insert a Super Admin User
-    const [superAdminRole] = await connection.query('SELECT id FROM roles WHERE name = ?', ['Super Admin']);
-    
-    if (superAdminRole.length > 0) {
-      const superAdminId = superAdminRole[0].id;
-      const hashedPassword = await bcrypt.hash('superadmin123', 10);
-      await connection.query(
-        'INSERT IGNORE INTO users (username, email, password_hash, role_id) VALUES (?, ?, ?, ?)', 
-        ['superadmin', 'superadmin@zorvyn.com', hashedPassword, superAdminId]
-      );
-      console.log('✅ Default superadmin user seeded (superadmin / superadmin123)');
+    const rolesToSeed = ['Super Admin', 'Accountant', 'Auditor', 'Viewer'];
+    const hashedPassword = await bcrypt.hash('password123', 10);
+
+    for (const roleName of rolesToSeed) {
+      const [role] = await connection.query('SELECT id FROM roles WHERE name = ?', [roleName]);
+      if (role.length > 0) {
+        const username = roleName.toLowerCase().replace(' ', '');
+        await connection.query(
+          'INSERT IGNORE INTO users (username, email, password_hash, role_id) VALUES (?, ?, ?, ?)', 
+          [username, `${username}@zorvyn.com`, hashedPassword, role[0].id]
+        );
+      }
     }
+    
+    console.log('✅ Test users seeded (Password for all: password123)');
+    console.log('   - superadmin@zorvyn.com');
+    console.log('   - accountant@zorvyn.com');
+    console.log('   - auditor@zorvyn.com');
+    console.log('   - viewer@zorvyn.com');
 
     await connection.end();
     console.log('🎉 Database initialization complete!');

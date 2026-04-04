@@ -11,6 +11,7 @@ function App() {
   const [password, setPassword] = useState('');
   const [summary, setSummary] = useState(null);
   const [records, setRecords] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
   const [error, setError] = useState('');
 
   // Form State
@@ -26,6 +27,7 @@ function App() {
     if (token) {
       fetchDashboard();
       fetchRecords();
+      fetchAuditLogs();
     }
   }, [token]);
 
@@ -48,6 +50,7 @@ function App() {
     setUser(null);
     setSummary(null);
     setRecords([]);
+    setAuditLogs([]);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   };
@@ -78,6 +81,19 @@ function App() {
     }
   };
 
+  const fetchAuditLogs = async () => {
+    try {
+      const { data } = await axios.get(`${API_URL}/records/audit-logs`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAuditLogs(data.data);
+    } catch (err) {
+      if(err.response?.status === 403) {
+        setAuditLogs([{ id: 'error', action_type: 'Permission Denied', username: 'System', timestamp: '' }]);
+      }
+    }
+  };
+
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
@@ -87,6 +103,7 @@ function App() {
       setFormData({ amount: '', type: 'expense', category: '', date: new Date().toISOString().split('T')[0], notes: '' });
       fetchDashboard();
       fetchRecords();
+      fetchAuditLogs();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to create record');
     }
@@ -100,6 +117,7 @@ function App() {
       });
       fetchDashboard();
       fetchRecords();
+      fetchAuditLogs();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete record');
     }
@@ -199,6 +217,23 @@ function App() {
                 ))}
               </tbody>
             </table>
+          )}
+
+          {auditLogs.length > 0 && (
+             <div className="audit-section">
+               <h3>Activity Log (Auditor Only)</h3>
+                {auditLogs[0].id === 'error' ? (
+                  <p className="info-box">Only Auditors and Admins can view the central Activity Log.</p>
+                ) : (
+                  <ul className="audit-list">
+                    {auditLogs.map(log => (
+                      <li key={log.id}>
+                        <strong>{log.username}</strong> performed <strong>{log.action_type}</strong> on {log.target_table} ({log.timestamp.replace('T', ' ').substring(0, 19)})
+                      </li>
+                    ))}
+                  </ul>
+                )}
+             </div>
           )}
         </section>
       </div>
