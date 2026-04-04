@@ -1,6 +1,29 @@
 import React from 'react';
 
+const formatDetails = (details) => {
+  if (!details) return "System metadata update - No specific notes provided.";
+  
+  if (typeof details === 'string') {
+    try {
+      const parsed = JSON.parse(details);
+      return formatDetails(parsed);
+    } catch {
+      return details;
+    }
+  }
+  
+  if (typeof details === 'object') {
+    if (details.amount !== undefined) {
+      return `${details.type === 'income' ? 'Income' : 'Expense'}: $${details.amount} (${details.category}) ${details.notes ? `- ${details.notes}` : ''}`;
+    }
+    return JSON.stringify(details);
+  }
+  
+  return String(details);
+};
+
 const AuditLogView = ({ auditLogs, userRole }) => {
+
   if (!userRole) {
     return (
       <div className="card-container">
@@ -47,7 +70,7 @@ const AuditLogView = ({ auditLogs, userRole }) => {
                 Executed by <strong>{log.username}</strong> on table <code>{log.target_table}</code>
               </div>
               <div style={{fontSize: '0.8rem', color: 'var(--text-dim)'}}>
-                {log.details || "System metadata update - No specific notes provided."}
+                {formatDetails(log.details)}
                 {log.action_type === 'DELETE' && <span style={{color: 'var(--error)', marginLeft: '10px'}}>! PERMANENT DELETION</span>}
               </div>
               <div style={{fontSize: '0.7rem', color: '#999', marginTop: '4px'}}>
