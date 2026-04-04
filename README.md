@@ -1,48 +1,114 @@
-# Finance Data Processing and Access Control Dashboard
+# 💹 Zorvyn Finance Dashboard
 
-A robust backend architecture for managing financial records securely using Role-Based Access Control (RBAC). A lightweight React frontend is included purely for testing API consumption and verifying RBAC responses.
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-005C84?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-## Architecture Highlights
-- **Layered Clean Architecture**: Strict separation of concerns (Routes -> Controllers -> Validation Middleware -> DB interaction).
-- **Core Stack**: Data management with raw nested **MySQL** queries. Server with **Express.js** and **Node.js**. Built natively as ES modules.
-- **Extensible RBAC**: Role-Permission mapping resides in the database, allowing granular control without massive hardcoded rule branches.
-- **Micro-testing Frontend**: Uses default Create React App specifically designed to mirror the login state and showcase access errors correctly. 
+**Zorvyn Finance Dashboard** is an enterprise-grade, multi-tenant financial management system. It provides a secure, role-based environment for organizations to track income, expenses, and manage personnel with a complete audit trail.
 
-## Requirements
-- Node.js (v18+)
-- MySQL (v8.0+)
+---
 
-## Quick Setup Guide
+## 🚀 Key Features
 
-### 1. Database Setup
-Create your local MySQL database space.
-Create a `.env` file in the `server/` directory:
+- **🏢 Multi-Tenant Architecture**: Strict data isolation between organizations (tenants).
+- **🔐 Granular RBAC**: Dynamic Role-Based Access Control managed via database permissions.
+- **📜 Audit Transparency**: Comprehensive logging of all financial modifications for compliance.
+- **📊 Real-time Analytics**: Instant financial summaries including Net Balance, Income, and Expense tracking.
+- **👥 Personnel Management**: Administrator-level controls for provisioning and managing team members.
+- **🛠️ Dockerized Environment**: Seamless deployment with pre-configured container orchestration.
+
+---
+
+## 📐 System Architecture
+
+```mermaid
+graph TD
+    User((User Browser)) -- HTTPS --> Vercel[Vercel Frontend]
+    Vercel -- API Calls /api --> EC2[EC2 Backend Instance]
+    subgraph "Docker Compose Network"
+        EC2 -- Port 5005 --> Express[Express.js App]
+        Express -- Port 3306 --> MySQL[(MySQL DB)]
+    end
 ```
-PORT=5000
-DB_HOST=localhost
+
+---
+
+## 🛡️ Role-Based Access Control (RBAC) Matrix
+
+| Role | Dashboard | Records (Read) | Records (Write) | Audit Logs | Team Management |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Super Admin** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Admin** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Accountant** | ✅ | ✅ | ✅ | ❌ | ❌ |
+| **Auditor** | ✅ | ✅ | ❌ | ✅ | ❌ |
+| **Viewer** | ✅ | ❌ | ❌ | ❌ | ❌ |
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend**: React, Axios for API orchestration, Vanilla CSS (Premium Aesthetics).
+- **Backend**: Node.js & Express.js (ES Modules), Raw MySQL queries for performance.
+- **Security**: JWT (JsonWebToken) Auth, Bcrypt password hashing.
+- **Infrastructure**: Docker & Docker Compose, Vercel (Front-end), AWS EC2 (Back-end).
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Prerequisites
+- Docker & Docker Compose
+- Node.js v18+ (for local development)
+
+### 2. Environment Configuration
+Create a `.env` file in the `server/` directory:
+```env
+PORT=5005
+DB_HOST=db  # Use 'localhost' for local, 'db' for Docker
 DB_USER=root
-DB_PASSWORD=yourpassword
+DB_PASSWORD=YourSecurePassword
 DB_NAME=zorvyn_finance
-JWT_SECRET=supersecretjwtkey_12345
+JWT_SECRET=your_super_secret_key
 NODE_ENV=development
 ```
 
-Run the initialization script from the `/server` folder to structurally seed tables, default permissions, and a test superadmin user:
+### 3. Quick Start (Docker)
+Bootstrap the entire environment with a single command:
+```bash
+docker-compose up --build
+```
+
+### 4. Local Development
+**Server Setup:**
 ```bash
 cd server
-npm run init-db
+npm install
+npm run init-db  # Initializes tables and seeds default roles/users
+npm run dev
 ```
-*(You may need to add `"init-db": "node scripts/initDb.js"` to your `server/package.json` scripts if not automatically set up).*
 
-### 2. Run the Application Concurrently
-From the root directory, simply run:
+**Client Setup:**
 ```bash
+cd client
+npm install
 npm start
 ```
-This will utilize `concurrently` to boot up **both** the backend API (`http://localhost:5000`) and the React UI tester (`http://localhost:3000`) in the same terminal instance.
-**Email**: `superadmin@zorvyn.com`
-**Pass**: `superadmin123`
 
-## Assumptions & Tradeoffs
-1. **Lightweight Frontend**: The frontend deliberately lacks polish (e.g., specific creation modals, intricate routing) as its only responsibility is proving the robust backend endpoints process permissions accurately.
-2. **Framework Abstinence**: Explicitly used raw SQL rather than high-level ORMs (Prisma, Sequelize) to demonstrate optimal DB query joining for dashboard aggregations and raw role-permission indexing.
+---
+
+## 🔐 Default Credentials (Test Environment)
+| Identity | Password |
+| :--- | :--- |
+| `superadmin@zorvyn.com` | `password123` |
+| `accountant@zorvyn.com` | `password123` |
+| `auditor@zorvyn.com` | `password123` |
+
+---
+
+## 📄 License
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+*Developed by the Zorvyn Engineering Team.*
