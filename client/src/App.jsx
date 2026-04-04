@@ -9,7 +9,7 @@ import WelcomeInfo from './components/WelcomeInfo';
 import AuditLogView from './components/AuditLogView';
 import TeamManagement from './components/TeamManagement';
 
-const API_BASE = process.env.REACT_APP_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5005/api/v1' : 'http://44.192.49.3:5005/api/v1');
+const API_BASE = process.env.REACT_APP_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5005/api/v1' : '/api/v1');
 
 function App() {
   const getStoredUser = () => {
