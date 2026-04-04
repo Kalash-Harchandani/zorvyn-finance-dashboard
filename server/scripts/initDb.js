@@ -98,8 +98,8 @@ const initDb = async () => {
     
     console.log('✅ Tables created successfully');
 
-    // Insert Default Roles if they don't exist
-    const roles = [
+    // Default Roles
+    const rolesData = [
       ['Viewer', 'Read-only dashboard access'],
       ['Analyst', 'Read financial data + access analytics'],
       ['Accountant', 'Create and update financial records. Cannot manage users'],
@@ -109,10 +109,58 @@ const initDb = async () => {
       ['Super Admin', 'Full system-level control']
     ];
 
-    for (const role of roles) {
+    for (const role of rolesData) {
       await connection.query('INSERT IGNORE INTO roles (name, description) VALUES (?, ?)', role);
     }
     console.log('✅ Default roles seeded');
+
+    // Default Permissions
+    const permissionsData = [
+      ['read:dashboard', 'Can view dashboard analytics'],
+      ['read:records', 'Can read list and detail of records'],
+      ['create:records', 'Can create new financial records'],
+      ['update:records', 'Can update existing records'],
+      ['delete:records', 'Can soft delete records'],
+      ['read:audit_logs', 'Can view audit logs']
+    ];
+
+    for (const perm of permissionsData) {
+      await connection.query('INSERT IGNORE INTO permissions (action, description) VALUES (?, ?)', perm);
+    }
+    console.log('✅ Default permissions seeded');
+
+    // Map Permissions to Roles
+    // Example Maps:
+    // Viewer -> read:dashboard
+    // Analyst -> read:dashboard, read:records
+    // Accountant -> read:dashboard, read:records, create:records, update:records
+    // Auditor -> read:dashboard, read:records, read:audit_logs
+    // Manager -> read:dashboard, read:records
+    // Admin -> read:dashboard, read:records, create:records, update:records, delete:records, read:audit_logs
+
+    const mappings = {
+      'Viewer': ['read:dashboard'],
+      'Analyst': ['read:dashboard', 'read:records'],
+      'Accountant': ['read:dashboard', 'read:records', 'create:records', 'update:records'],
+      'Auditor': ['read:dashboard', 'read:records', 'read:audit_logs'],
+      'Manager': ['read:dashboard', 'read:records'],
+      'Admin': ['read:dashboard', 'read:records', 'create:records', 'update:records', 'delete:records', 'read:audit_logs']
+    };
+
+    for (const [roleName, actions] of Object.entries(mappings)) {
+      const [r] = await connection.query('SELECT id FROM roles WHERE name = ?', [roleName]);
+      if (r.length === 0) continue;
+      
+      const roleId = r[0].id;
+
+      for (const action of actions) {
+        const [p] = await connection.query('SELECT id FROM permissions WHERE action = ?', [action]);
+        if (p.length > 0) {
+           await connection.query('INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)', [roleId, p[0].id]);
+        }
+      }
+    }
+    console.log('✅ Role-Permission mappings seeded');
 
     // Also Insert a Super Admin User
     const [superAdminRole] = await connection.query('SELECT id FROM roles WHERE name = ?', ['Super Admin']);
