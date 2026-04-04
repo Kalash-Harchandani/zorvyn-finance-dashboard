@@ -5,32 +5,42 @@ const WelcomeInfo = () => {
     { email: 'superadmin@zorvyn.com', role: 'Super Admin', access: 'All Access' },
     { email: 'accountant@zorvyn.com', role: 'Accountant', access: 'Create/View' },
     { email: 'auditor@zorvyn.com', role: 'Auditor', access: 'Read/Audit' },
-    { email: 'viewer@zorvyn.com', role: 'Viewer', access: 'Dashboard Only' },
+    { email: 'viewer@zorvyn.com', role: 'Viewer', access: 'Insights Only' },
   ];
 
   return (
     <div className="welcome-info-container">
-      <div className="workspace-badge">🏢 Workspace: Zorvyn Headquarters (Global Demo)</div>
-      <h3>🚀 Getting Started with Multi-Tenant Workspaces</h3>
-      <p>Welcome to your professional finance dashboard. Explore our **Role-Based Access Control (RBAC)** across isolated organizations. You can either test with our pre-seeded team below or create your own private workspace.</p>
+      <div className="workspace-badge">🏢 Active Workspace: Zorvyn HQ (Public Demo)</div>
+      <h1 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>Master Your Data Isolation</h1>
+      <p style={{fontSize: '1.1rem', color: '#475569', marginBottom: '2rem'}}>
+        Experience a production-grade **Multi-Tenant Architecture**. 
+        Every workspace is a private silo—what you build here stays here.
+      </p>
       
       <div className="test-profiles-grid">
         {testUsers.map((u) => (
           <div key={u.email} className="test-profile-card">
             <div className="profile-role">{u.role}</div>
             <div className="profile-email">{u.email}</div>
-            <div className="profile-access">{u.access}</div>
             <div className="profile-pass">Password: <code>password123</code></div>
           </div>
         ))}
       </div>
 
       <div className="usage-guide">
-        <h4>Key Isolated Features:</h4>
-        <ul>
-          <li><strong>Organization Walls:</strong> Register a new workspace to see 100% data isolation. Records created in Acme Corp can **never** be seen by Zorvyn HQ.</li>
-          <li><strong>Team Management:</strong> Log in as an Admin to invite your own Accountants and Auditors. They will be automatically linked to your organization.</li>
-          <li><strong>Audit Logging:</strong> System monitoring is scoped to your organization only. Auditors only see activity from their specific team members.</li>
+        <h4 style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+           💡 Quick Testing Path
+        </h4>
+        <ul style={{marginTop: '15px', listStyle: 'none'}}>
+          <li style={{marginBottom: '12px'}}>
+            <strong>Step 1:</strong> Log in as an <strong>Accountant</strong> and add a new "Office Supply" expense.
+          </li>
+          <li style={{marginBottom: '12px'}}>
+            <strong>Step 2:</strong> Logout and join as an <strong>Auditor</strong> to see that action logged in real-time.
+          </li>
+          <li>
+            <strong>Step 3:</strong> Register your <strong>own Workspace</strong> to see that it starts as a 100% clean slate!
+          </li>
         </ul>
       </div>
     </div>
