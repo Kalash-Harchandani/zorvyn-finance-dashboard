@@ -15,31 +15,34 @@ const TransactionTable = ({ records, onDelete }) => {
       <table className="transaction-table">
         <thead>
           <tr>
-            <th>Date</th>
+            <th>Accounting Date</th>
             <th>Category</th>
             <th>Type</th>
-            <th>Amount</th>
-            <th>Actions</th>
+            <th>Digital Amount</th>
+            <th style={{textAlign: 'right'}}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {records.map((r) => (
             <tr key={r.id}>
               <td>{new Date(r.date).toLocaleDateString()}</td>
-              <td>{r.category}</td>
-              <td className={`type-cell ${r.type}`}>
-                {r.type.toUpperCase()}
+              <td style={{fontWeight: '600'}}>{r.category}</td>
+              <td>
+                <span className={`badge badge-${r.type}`}>
+                  {r.type.toUpperCase()}
+                </span>
               </td>
-              <td className="amount-cell">
+              <td className="stat-value" style={{fontSize: '1rem', fontWeight: '700'}}>
                 ${Number(r.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </td>
-              <td>
+              <td style={{textAlign: 'right'}}>
                 <button 
                   onClick={() => onDelete(r.id)} 
-                  className="btn btn-delete btn-sm"
-                  title="Delete Transaction"
+                  className="logout-menu-item"
+                  style={{padding: '8px', marginTop: '0', display: 'inline-flex', width: 'auto'}}
+                  title="Purge Record"
                 >
-                  🗑️
+                  <span style={{fontSize: '1rem'}}>🗑️</span>
                 </button>
               </td>
             </tr>

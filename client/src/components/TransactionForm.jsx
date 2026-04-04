@@ -2,12 +2,12 @@ import React from 'react';
 
 const TransactionForm = ({ formData, setFormData, onSubmit }) => {
   return (
-    <div className="card-container form-card">
-      <h3>➕ New Transaction</h3>
+    <div className="card-container">
+      <h3 style={{marginBottom: '2rem'}}>➕ Record Transaction</h3>
       <form onSubmit={onSubmit}>
         <div className="form-group row">
           <div className="input-group">
-            <label>Amount</label>
+            <label>Transaction Amount</label>
             <div className="currency-input">
               <span className="currency-symbol">$</span>
               <input
@@ -21,7 +21,7 @@ const TransactionForm = ({ formData, setFormData, onSubmit }) => {
             </div>
           </div>
           <div className="input-group">
-            <label>Type</label>
+            <label>Operation Type</label>
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -34,17 +34,17 @@ const TransactionForm = ({ formData, setFormData, onSubmit }) => {
 
         <div className="form-group row">
           <div className="input-group">
-            <label>Category</label>
+            <label>Business Category</label>
             <input
               type="text"
-              placeholder="e.g. Salary, Food"
+              placeholder="e.g. Salary, Operations"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               required
             />
           </div>
           <div className="input-group">
-            <label>Date</label>
+            <label>Accounting Date</label>
             <input
               type="date"
               value={formData.date}
@@ -55,15 +55,16 @@ const TransactionForm = ({ formData, setFormData, onSubmit }) => {
         </div>
 
         <div className="form-group">
-          <label>Notes (Optional)</label>
+          <label>Audit Notes (Optional)</label>
           <textarea
-            placeholder="Add details..."
+            rows="3"
+            placeholder="Provide context for this record..."
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
           />
         </div>
 
-        <button type="submit" className="btn btn-primary btn-block">Add Record</button>
+        <button type="submit" className="btn-elite btn-block">ADD TO LEDGER</button>
       </form>
     </div>
   );

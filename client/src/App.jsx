@@ -284,16 +284,17 @@ function App() {
                  onSubmit={handleCreate} 
                />
                 <div className="card-container">
-                  <header style={{display: 'flex', justifyContent: 'space-between', marginBottom: '15px'}}>
-                     <h3>Recent Activity</h3>
-                     <small className="text-muted">Reflects your organization's latest moves</small>
+                  <header style={{display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem'}}>
+                     <h3>LATEST LEDGER ACTIVITY</h3>
+                     <small className="text-muted">SYNCED LIVE</small>
                   </header>
                   {records.length > 0 ? (
                     <TransactionTable records={records.slice(0, 5)} onDelete={handleDelete} />
                   ) : (
-                    <div className="empty-state" style={{padding: '40px', textAlign: 'center', background: '#f8fafc', border: '2px dashed #e2e8f0', borderRadius: '12px'}}>
-                      <div style={{fontSize: '2rem', marginBottom: '10px'}}>📝</div>
-                      <p className="text-muted">No transactions yet. Use the form on the left to add your first record!</p>
+                    <div className="empty-state">
+                      <div className="empty-state-icon">📝</div>
+                      <h4>Ledger is currently empty</h4>
+                      <p>Start by recording a transaction using the terminal on the left.</p>
                     </div>
                   )}
                </div>
@@ -304,18 +305,17 @@ function App() {
         {token && activeTab === 'transactions' && (
           <div className="transactions-view">
              <div className="card-container">
-                <header style={{display: 'flex', justifyContent: 'space-between', marginBottom: '20px'}}>
-                   <h3>All Transactions</h3>
-                   <button className="btn btn-primary btn-sm" onClick={() => setActiveTab('overview')}>+ Add New Record</button>
+                <header style={{display: 'flex', justifyContent: 'space-between', marginBottom: '2rem'}}>
+                   <h3>FULL TRANSACTION ARCHIVE</h3>
+                   <button className="btn-elite" style={{padding: '8px 20px', fontSize: '0.8rem'}} onClick={() => setActiveTab('overview')}>+ NEW RECORD</button>
                 </header>
                 {records.length > 0 ? (
                   <TransactionTable records={records} onDelete={handleDelete} />
                 ) : (
-                  <div className="empty-state" style={{padding: '60px', textAlign: 'center'}}>
-                    <div style={{fontSize: '3rem', marginBottom: '20px'}}>📂</div>
-                    <h4>Your financial history is empty</h4>
-                    <p className="text-muted">Once you start adding income or expenses, they will appear here with full details.</p>
-                    <button className="btn btn-primary" style={{marginTop: '20px'}} onClick={() => setActiveTab('overview')}>Get Started</button>
+                  <div className="empty-state">
+                    <div className="empty-state-icon">📂</div>
+                    <h4>No data points available</h4>
+                    <p>Once you initialize your first record, it will be archived here.</p>
                   </div>
                 )}
              </div>

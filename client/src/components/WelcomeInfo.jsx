@@ -7,41 +7,39 @@ const WelcomeInfo = () => {
   ];
 
   return (
-    <div className="welcome-info-vertical">
+    <div className="landing-info-vertical">
       <div className="workspace-badge" style={{marginBottom: '2rem'}}>
-         🔐 SECURITY FIRST | MULTI-TENANCY ACTIVE
+         🔐 ISOLATED ARCHITECTURE ACTIVE
       </div>
       
-      <h1 style={{fontSize: '3.5rem', fontWeight: '800', lineHeight: '1.1', marginBottom: '1.5rem'}}>
-        The Next Generation of <span style={{color: 'var(--primary)', textShadow: '0 0 40px var(--primary-glow)'}}>Finance.</span>
+      <h1 style={{fontSize: '4rem', fontWeight: '800', lineHeight: '1.0', marginBottom: '2rem'}}>
+        Absolute Data <span className="text-primary" style={{textShadow: '0 0 50px var(--primary-glow)'}}>Integrity.</span>
       </h1>
       
-      <p style={{fontSize: '1.25rem', color: 'var(--text-secondary)', marginBottom: '3rem', maxWidth: '600px'}}>
-        Experience absolute data isolation with Zorvyn's enterprise-grade workspace architecture.
+      <p style={{fontSize: '1.25rem', color: 'var(--text-dim)', marginBottom: '3.5rem', maxWidth: '600px', fontWeight: '400'}}>
+        Experience the first multi-tenant finance console designed for 100% data silo compliance.
       </p>
 
-      <div className="usage-guide" style={{marginBottom: '3rem'}}>
-        <h4 style={{fontSize: '1.1rem', marginBottom: '1rem', color: 'white'}}>⚡ QUICK START GUIDE</h4>
-        <ul style={{listStyle: 'none', padding: '0', color: 'var(--text-secondary)', fontSize: '0.95rem'}}>
-          <li style={{marginBottom: '10px'}}>1. <strong>Simulate</strong>: Login as an Accountant.</li>
-          <li style={{marginBottom: '10px'}}>2. <strong>Audit</strong>: Log out and join as an Auditor.</li>
-          <li>3. <strong>Scale</strong>: Create your own organization to start fresh.</li>
+      <div className="usage-guide" style={{marginBottom: '4rem'}}>
+        <h4 style={{fontSize: '0.8rem', color: 'white', letterSpacing: '0.2em', marginBottom: '1.5rem'}}>SYSTEM OPERATION GUIDELINES</h4>
+        <ul style={{listStyle: 'none', padding: '0', color: 'var(--text-dim)', fontSize: '1rem', display: 'flex', flexDirection: 'column', gap: '12px'}}>
+          <li>1. <strong>SIMULATE</strong>: Login as an Accountant to add records.</li>
+          <li>2. <strong>AUDIT</strong>: Join as an Auditor to verify logs.</li>
+          <li>3. <strong>SCALE</strong>: Register a unique workspace to start fresh.</li>
         </ul>
       </div>
 
       <div className="credentials-section">
-        <h4 style={{fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: '1.5rem'}}>
-           Demo Credentials (Zorvyn HQ)
+        <h4 style={{fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'var(--text-muted)', marginBottom: '1.5rem'}}>
+           Pre-Seeded Instance Access
         </h4>
-        <div className="test-profiles-vertical" style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
+        <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
           {testUsers.map((u) => (
             <div key={u.email} className="test-profile-card">
-              <div className="profile-icon" style={{width: '32px', height: '32px', background: 'var(--primary-glow)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyCenter: 'center', fontSize: '1rem'}}>
-                 👤
-              </div>
+              <div className="site-logo" style={{width: '36px', height: '36px', fontSize: '1rem', background: 'var(--bg-accent)'}}>👤</div>
               <div className="profile-details">
-                <div className="profile-role">{u.role}</div>
-                <div className="profile-email">{u.email} <span style={{color: 'var(--text-muted)'}}>•</span> <code style={{color: 'var(--primary)'}}>{u.pass}</code></div>
+                <div className="profile-role" style={{fontSize: '0.85rem', fontWeight: '800'}}>{u.role}</div>
+                <div className="profile-email" style={{fontSize: '0.8rem'}}>{u.email} <span style={{marginLeft: '8px', color: 'var(--primary)', fontWeight: '600'}}>{u.pass}</span></div>
               </div>
             </div>
           ))}
