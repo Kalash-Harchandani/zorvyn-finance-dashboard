@@ -188,6 +188,7 @@ function App() {
     }
   };
 
+  // Integrated View Logic
   return (
     <div className="app-layout">
       {token && (
@@ -200,62 +201,76 @@ function App() {
       )}
 
       <main className="main-content-view">
+        {/* ELITE LANDING PAGE: 2-PANEL SPLIT */}
         {(!token || activeTab === 'welcome') && (
-          <div className="welcome-and-login">
-            <WelcomeInfo />
+          <div className="landing-split-container">
+            <div className="landing-left-panel">
+              <WelcomeInfo />
+            </div>
             
-            {!token && (
-              <div className="landing-login-section card-container">
-                <h3>{isRegistering ? '🏢 Create Your Organization' : '🔓 Access Your Financial Console'}</h3>
-                <p className="text-muted">
-                  {isRegistering 
-                    ? 'Start your own private workspace and invite your team.' 
-                    : 'Enter credentials from any profile above to start testing.'}
-                </p>
-                <form onSubmit={isRegistering ? handleRegister : handleLogin} className="create-form" style={{marginTop: '20px'}}>
-                  {isRegistering && (
+            <div className="landing-right-panel">
+              {!token ? (
+                <div className="auth-portal-card">
+                  <div style={{textAlign: 'center', marginBottom: '2rem'}}>
+                    <h2 style={{fontSize: '2rem', marginBottom: '0.5rem'}}>
+                      {isRegistering ? 'Create Workspace' : 'Control Portal'}
+                    </h2>
+                    <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem'}}>
+                      {isRegistering 
+                        ? 'Boot a and new private organization instance.' 
+                        : 'Enter credentials for secure instance access.'}
+                    </p>
+                  </div>
+
+                  <form onSubmit={isRegistering ? handleRegister : handleLogin}>
+                    {isRegistering && (
+                      <input 
+                        className="input-stealth"
+                        type="text" 
+                        placeholder="Organization Name" 
+                        value={organizationName} 
+                        onChange={e => setOrganizationName(e.target.value)} 
+                        required
+                      />
+                    )}
                     <input 
-                      type="text" 
-                      placeholder="Organization Name (e.g. Acme Corp)" 
-                      value={organizationName} 
-                      onChange={e => setOrganizationName(e.target.value)} 
+                      className="input-stealth"
+                      type="email" 
+                      placeholder="Identifer (Email)" 
+                      value={email} 
+                      onChange={e => setEmail(e.target.value)} 
                       required
                     />
-                  )}
-                  <input 
-                    type="email" 
-                    placeholder="Email address" 
-                    value={email} 
-                    onChange={e => setEmail(e.target.value)} 
-                    required
-                  />
-                  <input 
-                    type="password" 
-                    placeholder="Password" 
-                    value={password} 
-                    onChange={e => setPassword(e.target.value)} 
-                    required
-                  />
-                  <button type="submit" className="btn btn-primary btn-block">
-                    {isRegistering ? 'Register & Create Workspace' : 'Login to Dashboard'}
-                  </button>
-                </form>
-                {authError && <p className="warning-text" style={{marginTop: '15px'}}>{authError}</p>}
-                
-                <div style={{marginTop: '20px', textAlign: 'center'}}>
-                  <button className="btn-link" onClick={() => setIsRegistering(!isRegistering)}>
-                    {isRegistering ? 'Already have a workspace? Login' : 'Need a new private workspace? Register here'}
-                  </button>
+                    <input 
+                      className="input-stealth"
+                      type="password" 
+                      placeholder="Access Code (Password)" 
+                      value={password} 
+                      onChange={e => setPassword(e.target.value)} 
+                      required
+                    />
+                    <button type="submit" className="btn-elite">
+                      {isRegistering ? 'INITIALIZE WORKSPACE' : 'AUTHENTICATE'}
+                    </button>
+                  </form>
+                  
+                  {authError && <p className="warning-text" style={{marginTop: '20px', textAlign: 'center', color: 'var(--error)'}}>{authError}</p>}
+                  
+                  <div style={{marginTop: '2rem', textAlign: 'center'}}>
+                    <button className="btn-link" style={{color: 'var(--text-muted)', fontSize: '0.85rem'}} onClick={() => setIsRegistering(!isRegistering)}>
+                      {isRegistering ? 'Existing Operator? Access Portal' : 'New Client? Request Instance'}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {token && activeTab === 'welcome' && (
-               <div className="card-container" style={{marginTop: '30px', textAlign: 'center'}}>
-                  <p>You are moving through the <strong>{user.organization}</strong> workspace as <strong>{user.username}</strong>.</p>
-                  <button className="btn btn-primary" onClick={() => setActiveTab('overview')}>Go to Console</button>
-               </div>
-            )}
+              ) : (
+                <div className="auth-portal-card" style={{textAlign: 'center'}}>
+                   <div style={{fontSize: '3rem', marginBottom: '1rem'}}>🏢</div>
+                   <h3>{user.organization}</h3>
+                   <p style={{color: 'var(--text-secondary)', marginBottom: '2rem'}}>Connected as <strong>{user.username}</strong></p>
+                   <button className="btn-elite" onClick={() => setActiveTab('overview')}>ENTER DASHBOARD</button>
+                </div>
+              )}
+            </div>
           </div>
         )}
         

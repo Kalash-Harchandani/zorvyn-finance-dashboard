@@ -11,21 +11,21 @@ const Sidebar = ({ activeTab, setActiveTab, user, onLogout }) => {
 
   return (
     <div className="sidebar-container">
-      <div className="sidebar-header" style={{marginBottom: '10px'}}>
+      <div className="sidebar-header" style={{marginBottom: '2rem'}}>
         <div className="site-logo">Z</div>
         <div className="workspace-branding">
-          <h2 style={{fontSize: '1rem', color: '#1e293b'}}>Zorvyn Finance</h2>
-          <small className="text-muted" style={{fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em'}}>
+          <h2 style={{fontSize: '1.1rem', color: 'var(--text-primary)'}}>Zorvyn Finance</h2>
+          <small className="text-muted" style={{fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--primary)', fontWeight: '700'}}>
             {user.organization || 'My Workspace'}
           </small>
         </div>
       </div>
 
-      <div className="user-profile-summary">
-        <div className="avatar">{user.username[0].toUpperCase()}</div>
+      <div className="user-profile-summary" style={{background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-dim)'}}>
+        <div className="avatar" style={{boxShadow: '0 0 15px var(--primary-glow)'}}>{user.username[0].toUpperCase()}</div>
         <div className="user-info">
-          <div className="username">{user.username}</div>
-          <span className="role-tag">{user.role}</span>
+          <div className="username" style={{color: 'white'}}>{user.username}</div>
+          <span className="role-tag" style={{background: 'var(--bg-card)', color: 'var(--text-secondary)', borderColor: 'var(--border-dim)'}}>{user.role}</span>
         </div>
       </div>
 
