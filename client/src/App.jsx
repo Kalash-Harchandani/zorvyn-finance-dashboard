@@ -171,9 +171,26 @@ function App() {
       <div className="landing-grid">
         <div style={{padding: '4rem', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
           <h1 style={{fontSize: '3rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.03em'}}>Zorvyn Finance</h1>
-          <p style={{fontSize: '1.1rem', color: '#666', maxWidth: '500px', marginBottom: '2rem'}}>
+          <p style={{fontSize: '1.1rem', color: '#666', maxWidth: '500px', marginBottom: '1.5rem'}}>
             Secure, enterprise-grade multi-tenant financial ledger. Strict role-based access control and comprehensive audit transparency.
           </p>
+
+          <div style={{
+            background: '#eef2ff', 
+            border: '1px solid #c7d2fe', 
+            padding: '1.25rem', 
+            borderRadius: 'var(--radius-md)', 
+            marginBottom: '2.5rem', 
+            color: '#3730a3',
+            fontSize: '0.85rem',
+            lineHeight: '1.6',
+            maxWidth: '600px',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+          }}>
+            <span style={{fontWeight: '800', textTransform: 'uppercase', fontSize: '0.75rem', display: 'block', marginBottom: '4px', letterSpacing: '0.05em'}}>System Guidance</span>
+            Use the <strong>Demo Matrix</strong> below to instantly explore various permission tiers. 
+            Alternatively, <strong>Create a New Workspace</strong> through the registration portal on the right to manage your own isolated organization and team members.
+          </div>
           
           <div className="access-matrix">
             <div className="matrix-tile">
