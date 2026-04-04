@@ -6,7 +6,8 @@
   "scripts": {
     "start": "concurrently \"npm start --prefix server\" \"npm start --prefix client\"",
     "dev": "concurrently \"npm run dev --prefix server\" \"npm start --prefix client\"",
-    "init-db": "npm run init-db --prefix server"
+    "init-db": "npm run init-db --prefix server",
+    "seed": "node server/scripts/seedData.js"
   },
   "repository": {
     "type": "git",

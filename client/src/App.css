@@ -85,10 +85,64 @@ header {
   text-align: center;
 }
 
-.income { color: #28a745; }
-.expense { color: #dc3545; }
-.positive { color: #28a745; }
-.negative { color: #dc3545; }
+.badge {
+  background: #007bff;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+.error-box {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 15px;
+  border-radius: 4px;
+  border: 1px solid #f5c6cb;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 30px;
+}
+
+.create-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  height: fit-content;
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.create-form input, .create-form select, .create-form textarea {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.create-form textarea {
+  height: 80px;
+}
+
+.income { color: #28a745; font-weight: bold; }
+.expense { color: #dc3545; font-weight: bold; }
+
+.delete-btn {
+  background: #dc3545;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+}
 
 table {
   width: 100%;
@@ -100,7 +154,7 @@ table {
 }
 
 th, td {
-  padding: 15px;
+  padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #eee;
 }

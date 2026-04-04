@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
-const API_URL = 'http://localhost:5000/api/v1';
+const API_URL = 'http://localhost:5005/api/v1';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -12,6 +12,15 @@ function App() {
   const [summary, setSummary] = useState(null);
   const [records, setRecords] = useState([]);
   const [error, setError] = useState('');
+
+  // Form State
+  const [formData, setFormData] = useState({
+    amount: '',
+    type: 'expense',
+    category: '',
+    date: new Date().toISOString().split('T')[0],
+    notes: ''
+  });
 
   useEffect(() => {
     if (token) {
@@ -50,9 +59,8 @@ function App() {
       });
       setSummary(data.data.summary);
     } catch (err) {
-      console.error(err);
       if(err.response?.status === 403) {
-         setSummary({ error: 'You do not have permission to view the dashboard overview.' });
+         setSummary({ error: 'Permission Denied: Cannot view dashboard summary.' });
       }
     }
   };
@@ -64,10 +72,36 @@ function App() {
       });
       setRecords(data.data);
     } catch (err) {
-      console.error(err);
       if(err.response?.status === 403) {
-        setRecords([{ id: 'error', notes: 'You do not have permission to view records lists.' }]);
+        setRecords([{ id: 'error', notes: 'Permission Denied: Cannot view records list.' }]);
       }
+    }
+  };
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API_URL}/records`, formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setFormData({ amount: '', type: 'expense', category: '', date: new Date().toISOString().split('T')[0], notes: '' });
+      fetchDashboard();
+      fetchRecords();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to create record');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure?')) return;
+    try {
+      await axios.delete(`${API_URL}/records/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchDashboard();
+      fetchRecords();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete record');
     }
   };
 
@@ -98,14 +132,17 @@ function App() {
   return (
     <div className="container dashboard">
       <header>
-        <h2>Welcome, {user?.username} ({user?.role})</h2>
+        <div>
+           <h2>Zorvyn Finance</h2>
+           <p>Logged in as: <strong>{user?.username}</strong> | Role: <span className="badge">{user?.role}</span></p>
+        </div>
         <button onClick={handleLogout} className="logout-btn">Logout</button>
       </header>
 
       <section className="summary">
-        <h3>Dashboard Summary</h3>
+        <h3>Analytics Overview</h3>
         {summary?.error ? (
-           <p className="error">{summary.error}</p>
+           <p className="error-box">{summary.error}</p>
         ) : summary ? (
           <div className="cards">
             <div className="card income">Income: ${summary.total_income}</div>
@@ -117,35 +154,54 @@ function App() {
         ) : <p>Loading summary...</p>}
       </section>
 
-      <section className="records">
-        <h3>Financial Records</h3>
-        {records.length > 0 && records[0].id === 'error' ? (
-           <p className="error">{records[0].notes}</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {records.map(r => (
-                <tr key={r.id}>
-                  <td>{r.date?.substring(0, 10)}</td>
-                  <td>{r.category}</td>
-                  <td>{r.type}</td>
-                  <td>${r.amount}</td>
-                  <td>{r.notes}</td>
+      <div className="main-content">
+        <section className="create-section">
+          <h3>Add New Transaction</h3>
+          <form onSubmit={handleCreate} className="create-form">
+            <input type="number" placeholder="Amount" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} />
+            <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+            <input type="text" placeholder="Category (e.g. Food)" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} />
+            <input type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />
+            <textarea placeholder="Notes" value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} />
+            <button type="submit">Add Record</button>
+          </form>
+        </section>
+
+        <section className="records">
+          <h3>Recent Transactions</h3>
+          {records.length > 0 && records[0].id === 'error' ? (
+             <p className="error-box">{records[0].notes}</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+              </thead>
+              <tbody>
+                {records.map(r => (
+                  <tr key={r.id}>
+                    <td>{r.date?.substring(0, 10)}</td>
+                    <td>{r.category}</td>
+                    <td className={r.type}>{r.type.toUpperCase()}</td>
+                    <td>${r.amount}</td>
+                    <td>
+                      <button onClick={() => handleDelete(r.id)} className="delete-btn">Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

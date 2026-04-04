@@ -10,8 +10,14 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors()); // Temporarily allow all for debugging
 app.use(express.json());
+
+// Basic Logger
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
 
 // Basic Route
 app.get('/', (req, res) => {
