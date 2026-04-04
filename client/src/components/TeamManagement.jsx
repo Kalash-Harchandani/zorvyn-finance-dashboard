@@ -8,7 +8,8 @@ const TeamManagement = ({ user, token }) => {
 
   const fetchTeam = useCallback(async () => {
     try {
-      const res = await axios.get('http://localhost:5005/api/v1/auth/team', {
+      const apiPath = (window.location.hostname === 'localhost' ? 'http://localhost:5005/api' : '/api') + '/auth/team';
+      const res = await axios.get(apiPath, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data && Array.isArray(res.data.data)) {
@@ -33,7 +34,8 @@ const TeamManagement = ({ user, token }) => {
     }
 
     try {
-      await axios.post('http://localhost:5005/api/v1/auth/team', {
+      const apiPath = (window.location.hostname === 'localhost' ? 'http://localhost:5005/api' : '/api') + '/auth/team';
+      await axios.post(apiPath, {
         username: newMember.username,
         email: newMember.email,
         password: newMember.password,
