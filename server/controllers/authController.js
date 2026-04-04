@@ -22,10 +22,12 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     return next(new AppError('User already exists', 400));
   }
 
-  // Find Super Admin role for the first user of a tenant
-  const superAdminRole = await Role.findByName('Super Admin');
-  if (!superAdminRole) {
-    return next(new AppError('Roles not initialized. Please run init-db.', 500));
+  // CRITICAL: Find the 'Super Admin' role with absolute precision
+  const [roleRows] = await db.query("SELECT id FROM roles WHERE name = 'Super Admin' LIMIT 1");
+  const superAdminRole = roleRows[0];
+  
+  if (!superAdminRole || !superAdminRole.id) {
+    return next(new AppError('Infrastructure Error: System roles missing.', 500));
   }
 
   // Create a new Tenant (Organization)
@@ -33,13 +35,18 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     'INSERT INTO tenants (name) VALUES (?)',
     [organizationName]
   );
+  
   const tenantId = tenantResult.insertId;
+  
+  if (!tenantId) {
+    return next(new AppError('Failed to initialize organization workspace.', 500));
+  }
 
   // Hash password
   const salt = await bcrypt.genSalt(10);
   const password_hash = await bcrypt.hash(password, salt);
 
-  // Create User as Super Admin for the new tenant
+  // Create User explicitly as the Super Admin of the newly created tenant
   const userId = await User.create({
     username,
     email,
@@ -51,6 +58,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
   if (userId) {
     res.status(201).json({
       status: 'success',
+      message: `Workspace [${organizationName}] initialized.`,
       data: {
         id: userId,
         username,
@@ -61,7 +69,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
       }
     });
   } else {
-    return next(new AppError('Failed to register user', 500));
+    return next(new AppError('Account creation aborted.', 500));
   }
 });
 
@@ -85,6 +93,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
         username: user.username,
         email: user.email,
         role: user.role_name,
+        organization: user.organization_name || 'Internal',
         tenant_id: user.tenant_id,
         token: generateToken(user.id, user.tenant_id),
       }

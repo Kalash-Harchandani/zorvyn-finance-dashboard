@@ -76,13 +76,14 @@ const initDb = async () => {
     await connection.query(`
       CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(100) UNIQUE NOT NULL,
+        username VARCHAR(100) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         role_id INT,
         tenant_id INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE (tenant_id, username),
         FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL,
         FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
       );
@@ -172,7 +173,8 @@ const initDb = async () => {
       'Accountant': ['read:dashboard', 'read:records', 'create:records', 'update:records'],
       'Auditor': ['read:dashboard', 'read:records', 'read:audit_logs'],
       'Manager': ['read:dashboard', 'read:records'],
-      'Admin': ['read:dashboard', 'read:records', 'create:records', 'update:records', 'delete:records', 'read:audit_logs', 'manage:team']
+      'Admin': ['read:dashboard', 'read:records', 'create:records', 'update:records', 'delete:records', 'read:audit_logs', 'manage:team'],
+      'Super Admin': ['read:dashboard', 'read:records', 'create:records', 'update:records', 'delete:records', 'read:audit_logs', 'manage:team']
     };
 
     for (const [roleName, actions] of Object.entries(mappings)) {

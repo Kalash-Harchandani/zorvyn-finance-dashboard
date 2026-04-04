@@ -3,10 +3,11 @@ import db from '../config/db.js';
 class User {
   static async findByEmail(email) {
     const [rows] = await db.query(
-      `SELECT users.*, roles.name as role_name 
-       FROM users 
-       LEFT JOIN roles ON users.role_id = roles.id 
-       WHERE email = ?`, 
+      `SELECT u.*, r.name as role_name, t.name as organization_name 
+       FROM users u
+       LEFT JOIN roles r ON u.role_id = r.id 
+       LEFT JOIN tenants t ON u.tenant_id = t.id
+       WHERE u.email = ?`, 
       [email]
     );
     return rows[0];
@@ -14,10 +15,11 @@ class User {
 
   static async findById(id) {
     const [rows] = await db.query(
-      `SELECT users.*, roles.name as role_name 
-       FROM users 
-       LEFT JOIN roles ON users.role_id = roles.id 
-       WHERE users.id = ?`, 
+      `SELECT u.*, r.name as role_name, t.name as organization_name 
+       FROM users u
+       LEFT JOIN roles r ON u.role_id = r.id 
+       LEFT JOIN tenants t ON u.tenant_id = t.id
+       WHERE u.id = ?`, 
       [id]
     );
     return rows[0];
