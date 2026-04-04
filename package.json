@@ -1,0 +1,25 @@
+{
+  "name": "zorvyn-finance-dashboard",
+  "version": "1.0.0",
+  "description": "A robust backend architecture for managing financial records securely using Role-Based Access Control (RBAC). A lightweight React frontend is included purely for testing API consumption and verifying RBAC responses.",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm start --prefix server\" \"npm start --prefix client\"",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm start --prefix client\"",
+    "init-db": "npm run init-db --prefix server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kalash-Harchandani/zorvyn-finance-dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kalash-Harchandani/zorvyn-finance-dashboard/issues"
+  },
+  "homepage": "https://github.com/Kalash-Harchandani/zorvyn-finance-dashboard#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

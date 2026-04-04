@@ -34,19 +34,12 @@ npm run init-db
 ```
 *(You may need to add `"init-db": "node scripts/initDb.js"` to your `server/package.json` scripts if not automatically set up).*
 
-### 2. Run the Backend
+### 2. Run the Application Concurrently
+From the root directory, simply run:
 ```bash
-cd server
 npm start
 ```
-By default, the backend hums optimally at `http://localhost:5000`.
-
-### 3. Run the Frontend (UI Tester)
-```bash
-cd client
-npm start
-```
-Head to `http://localhost:3000` to interact visually with the roles logic. Login with:
+This will utilize `concurrently` to boot up **both** the backend API (`http://localhost:5000`) and the React UI tester (`http://localhost:3000`) in the same terminal instance.
 **Email**: `superadmin@zorvyn.com`
 **Pass**: `superadmin123`
 
