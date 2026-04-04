@@ -22,6 +22,27 @@ const initDb = async () => {
     // Switch to the created database
     await connection.query(`USE \`${process.env.DB_NAME}\`;`);
 
+    // Drop existing tables in reverse order of dependencies to ensure a clean slate
+    console.log('🗑️ Cleaning up existing tables...');
+    await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
+    await connection.query('DROP TABLE IF EXISTS audit_logs;');
+    await connection.query('DROP TABLE IF EXISTS financial_records;');
+    await connection.query('DROP TABLE IF EXISTS users;');
+    await connection.query('DROP TABLE IF EXISTS role_permissions;');
+    await connection.query('DROP TABLE IF EXISTS permissions;');
+    await connection.query('DROP TABLE IF EXISTS roles;');
+    await connection.query('DROP TABLE IF EXISTS tenants;');
+    await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
+
+    // Create Tenants Table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS tenants (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     // Create Roles Table
     await connection.query(`
       CREATE TABLE IF NOT EXISTS roles (
@@ -59,9 +80,11 @@ const initDb = async () => {
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         role_id INT,
+        tenant_id INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL
+        FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL,
+        FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
       );
     `);
 
@@ -75,10 +98,12 @@ const initDb = async () => {
         date DATE NOT NULL,
         notes TEXT,
         created_by INT,
+        tenant_id INT,
         deleted_at TIMESTAMP NULL DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+        FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
       );
     `);
 
@@ -87,12 +112,14 @@ const initDb = async () => {
       CREATE TABLE IF NOT EXISTS audit_logs (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT,
+        tenant_id INT,
         action_type VARCHAR(100) NOT NULL,
         target_table VARCHAR(100) NOT NULL,
         target_id INT NOT NULL,
         details JSON,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+        FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
       );
     `);
     
@@ -121,7 +148,8 @@ const initDb = async () => {
       ['create:records', 'Can create new financial records'],
       ['update:records', 'Can update existing records'],
       ['delete:records', 'Can soft delete records'],
-      ['read:audit_logs', 'Can view audit logs']
+      ['read:audit_logs', 'Can view audit logs'],
+      ['manage:team', 'Can create and manage organization team members']
     ];
 
     for (const perm of permissionsData) {
@@ -136,7 +164,7 @@ const initDb = async () => {
     // Accountant -> read:dashboard, read:records, create:records, update:records
     // Auditor -> read:dashboard, read:records, read:audit_logs
     // Manager -> read:dashboard, read:records
-    // Admin -> read:dashboard, read:records, create:records, update:records, delete:records, read:audit_logs
+    // Admin -> read:dashboard, read:records, create:records, update:records, delete:records, read:audit_logs, manage:team
 
     const mappings = {
       'Viewer': ['read:dashboard'],
@@ -144,7 +172,7 @@ const initDb = async () => {
       'Accountant': ['read:dashboard', 'read:records', 'create:records', 'update:records'],
       'Auditor': ['read:dashboard', 'read:records', 'read:audit_logs'],
       'Manager': ['read:dashboard', 'read:records'],
-      'Admin': ['read:dashboard', 'read:records', 'create:records', 'update:records', 'delete:records', 'read:audit_logs']
+      'Admin': ['read:dashboard', 'read:records', 'create:records', 'update:records', 'delete:records', 'read:audit_logs', 'manage:team']
     };
 
     for (const [roleName, actions] of Object.entries(mappings)) {
@@ -162,6 +190,11 @@ const initDb = async () => {
     }
     console.log('✅ Role-Permission mappings seeded');
 
+    // Create a default Tenant (Workspace)
+    await connection.query('INSERT IGNORE INTO tenants (name) VALUES (?)', ['Zorvyn Headquarters']);
+    const [tenant] = await connection.query('SELECT id FROM tenants WHERE name = ?', ['Zorvyn Headquarters']);
+    const defaultTenantId = tenant[0].id;
+
     // Also Insert a Super Admin User
     const rolesToSeed = ['Super Admin', 'Accountant', 'Auditor', 'Viewer'];
     const hashedPassword = await bcrypt.hash('password123', 10);
@@ -170,14 +203,18 @@ const initDb = async () => {
       const [role] = await connection.query('SELECT id FROM roles WHERE name = ?', [roleName]);
       if (role.length > 0) {
         const username = roleName.toLowerCase().replace(' ', '');
+        const email = `${username}@zorvyn.com`;
         await connection.query(
-          'INSERT IGNORE INTO users (username, email, password_hash, role_id) VALUES (?, ?, ?, ?)', 
-          [username, `${username}@zorvyn.com`, hashedPassword, role[0].id]
+          `INSERT INTO users (username, email, password_hash, role_id, tenant_id) 
+           VALUES (?, ?, ?, ?, ?) 
+           ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), role_id = VALUES(role_id), tenant_id = VALUES(tenant_id)`, 
+          [username, email, hashedPassword, role[0].id, defaultTenantId]
         );
       }
     }
     
-    console.log('✅ Test users seeded (Password for all: password123)');
+    console.log('✅ Default Organization: Zorvyn Headquarters seeded');
+    console.log('✅ Test users seeded (Linked to Zorvyn Headquarters)');
     console.log('   - superadmin@zorvyn.com');
     console.log('   - accountant@zorvyn.com');
     console.log('   - auditor@zorvyn.com');

@@ -10,8 +10,9 @@ const WelcomeInfo = () => {
 
   return (
     <div className="welcome-info-container">
-      <h3>🚀 Getting Started with Zorvyn Finance</h3>
-      <p>Welcome to your professional finance dashboard. Explore our <strong>Role-Based Access Control (RBAC)</strong> by switching between the following test profiles.</p>
+      <div className="workspace-badge">🏢 Workspace: Zorvyn Headquarters (Global Demo)</div>
+      <h3>🚀 Getting Started with Multi-Tenant Workspaces</h3>
+      <p>Welcome to your professional finance dashboard. Explore our **Role-Based Access Control (RBAC)** across isolated organizations. You can either test with our pre-seeded team below or create your own private workspace.</p>
       
       <div className="test-profiles-grid">
         {testUsers.map((u) => (
@@ -25,11 +26,11 @@ const WelcomeInfo = () => {
       </div>
 
       <div className="usage-guide">
-        <h4>How to Test:</h4>
+        <h4>Key Isolated Features:</h4>
         <ul>
-          <li><strong>Audit Logging:</strong> Perform an action (like adding a record) as an Accountant, then login as an Auditor to see it in the Activity Log.</li>
-          <li><strong>Soft Deletion:</strong> Try deleting a record as a Super Admin; it will be marked as deleted in the database without being permanently lost.</li>
-          <li><strong>Permission Gates:</strong> Try accessing the Transactions list as a "Viewer" to see our gentle access restriction feedback.</li>
+          <li><strong>Organization Walls:</strong> Register a new workspace to see 100% data isolation. Records created in Acme Corp can **never** be seen by Zorvyn HQ.</li>
+          <li><strong>Team Management:</strong> Log in as an Admin to invite your own Accountants and Auditors. They will be automatically linked to your organization.</li>
+          <li><strong>Audit Logging:</strong> System monitoring is scoped to your organization only. Auditors only see activity from their specific team members.</li>
         </ul>
       </div>
     </div>

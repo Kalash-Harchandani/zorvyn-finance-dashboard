@@ -2,54 +2,54 @@ import db from '../config/db.js';
 
 class Record {
   static async create(recordData) {
-    const { amount, type, category, date, notes, created_by } = recordData;
+    const { amount, type, category, date, notes, created_by, tenant_id } = recordData;
     const [result] = await db.query(
-      `INSERT INTO financial_records (amount, type, category, date, notes, created_by) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [amount, type, category, date, notes, created_by]
+      `INSERT INTO financial_records (amount, type, category, date, notes, created_by, tenant_id) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [amount, type, category, date, notes, created_by, tenant_id]
     );
     return result.insertId;
   }
 
-  static async findById(id) {
+  static async findById(id, tenant_id) {
     const [rows] = await db.query(
-      `SELECT * FROM financial_records WHERE id = ? AND deleted_at IS NULL`,
-      [id]
+      `SELECT * FROM financial_records WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL`,
+      [id, tenant_id]
     );
     return rows[0];
   }
 
-  static async update(id, updates) {
+  static async update(id, tenant_id, updates) {
     const fields = Object.keys(updates);
     const values = Object.values(updates);
     
     if (fields.length === 0) return true;
 
     const setClause = fields.map(field => `${field} = ?`).join(', ');
-    values.push(id); 
+    values.push(id, tenant_id); 
 
     const [result] = await db.query(
-      `UPDATE financial_records SET ${setClause} WHERE id = ? AND deleted_at IS NULL`,
+      `UPDATE financial_records SET ${setClause} WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL`,
       values
     );
 
     return result.affectedRows > 0;
   }
 
-  static async softDelete(id) {
+  static async softDelete(id, tenant_id) {
     const [result] = await db.query(
-      `UPDATE financial_records SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?`,
-      [id]
+      `UPDATE financial_records SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND tenant_id = ?`,
+      [id, tenant_id]
     );
     return result.affectedRows > 0;
   }
 
-  static async getAll(filters = {}, options = { limit: 20, offset: 0 }) {
+  static async getAll(tenant_id, filters = {}, options = { limit: 20, offset: 0 }) {
     let query = `SELECT r.*, u.username as creator_name 
                  FROM financial_records r
                  LEFT JOIN users u ON r.created_by = u.id
-                 WHERE r.deleted_at IS NULL`;
-    const params = [];
+                 WHERE r.tenant_id = ? AND r.deleted_at IS NULL`;
+    const params = [tenant_id];
 
     if (filters.type) {
       query += ` AND r.type = ?`;
@@ -70,8 +70,8 @@ class Record {
     const [rows] = await db.query(query, params);
     
     // Total count for pagination
-    let countQuery = `SELECT COUNT(*) as total FROM financial_records r WHERE r.deleted_at IS NULL`;
-    const countParams = [];
+    let countQuery = `SELECT COUNT(*) as total FROM financial_records r WHERE r.tenant_id = ? AND r.deleted_at IS NULL`;
+    const countParams = [tenant_id];
     if (filters.type) { countQuery += ` AND r.type = ?`; countParams.push(filters.type); }
     if (filters.category) { countQuery += ` AND r.category LIKE ?`; countParams.push(`%${filters.category}%`); }
     if (filters.noteSearch) { countQuery += ` AND r.notes LIKE ?`; countParams.push(`%${filters.noteSearch}%`); }
@@ -82,14 +82,14 @@ class Record {
   }
 
   // Dashboard Aggregations
-  static async getSummary() {
+  static async getSummary(tenant_id) {
     const [rows] = await db.query(`
       SELECT 
         SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income,
         SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as total_expense
       FROM financial_records
-      WHERE deleted_at IS NULL
-    `);
+      WHERE tenant_id = ? AND deleted_at IS NULL
+    `, [tenant_id]);
     
     const income = rows[0].total_income || 0;
     const expense = rows[0].total_expense || 0;
@@ -100,13 +100,13 @@ class Record {
     };
   }
 
-  static async getCategoryTotals() {
+  static async getCategoryTotals(tenant_id) {
     const [rows] = await db.query(`
       SELECT category, type, SUM(amount) as total
       FROM financial_records
-      WHERE deleted_at IS NULL
+      WHERE tenant_id = ? AND deleted_at IS NULL
       GROUP BY category, type
-    `);
+    `, [tenant_id]);
     return rows;
   }
 }

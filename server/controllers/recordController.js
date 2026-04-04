@@ -4,10 +4,10 @@ import AppError from '../utils/AppError.js';
 import db from '../config/db.js';
 
 // Helper to create an audit log
-const createAuditLog = async (userId, action, targetTable, targetId, details) => {
+const createAuditLog = async (userId, tenantId, action, targetTable, targetId, details) => {
   await db.query(
-    `INSERT INTO audit_logs (user_id, action_type, target_table, target_id, details) VALUES (?, ?, ?, ?, ?)`,
-    [userId, action, targetTable, targetId, JSON.stringify(details)]
+    `INSERT INTO audit_logs (user_id, tenant_id, action_type, target_table, target_id, details) VALUES (?, ?, ?, ?, ?, ?)`,
+    [userId, tenantId, action, targetTable, targetId, JSON.stringify(details)]
   );
 };
 
@@ -26,10 +26,11 @@ export const createRecord = asyncHandler(async (req, res, next) => {
     category,
     date,
     notes,
-    created_by: req.user.id
+    created_by: req.user.id,
+    tenant_id: req.user.tenant_id
   });
 
-  await createAuditLog(req.user.id, 'CREATE', 'financial_records', recordId, { amount, type, category, date, notes });
+  await createAuditLog(req.user.id, req.user.tenant_id, 'CREATE', 'financial_records', recordId, { amount, type, category, date, notes });
 
   res.status(201).json({
     status: 'success',
@@ -50,7 +51,7 @@ export const getRecords = asyncHandler(async (req, res, next) => {
     noteSearch: req.query.search
   };
 
-  const { data, total } = await Record.getAll(filters, { limit, offset });
+  const { data, total } = await Record.getAll(req.user.tenant_id, filters, { limit, offset });
 
   res.json({
     status: 'success',
@@ -65,18 +66,18 @@ export const getRecords = asyncHandler(async (req, res, next) => {
 // @desc    Update a record
 // @route   PUT /api/v1/records/:id
 export const updateRecord = asyncHandler(async (req, res, next) => {
-  const record = await Record.findById(req.params.id);
+  const record = await Record.findById(req.params.id, req.user.tenant_id);
 
   if (!record) {
     return next(new AppError('Record not found', 404));
   }
 
   const updates = { ...req.body };
-  await Record.update(req.params.id, updates);
+  await Record.update(req.params.id, req.user.tenant_id, updates);
 
-  await createAuditLog(req.user.id, 'UPDATE', 'financial_records', req.params.id, updates);
+  await createAuditLog(req.user.id, req.user.tenant_id, 'UPDATE', 'financial_records', req.params.id, updates);
 
-  const updatedRecord = await Record.findById(req.params.id);
+  const updatedRecord = await Record.findById(req.params.id, req.user.tenant_id);
 
   res.json({
     status: 'success',
@@ -87,14 +88,14 @@ export const updateRecord = asyncHandler(async (req, res, next) => {
 // @desc    Delete a record (Soft Delete)
 // @route   DELETE /api/v1/records/:id
 export const deleteRecord = asyncHandler(async (req, res, next) => {
-  const record = await Record.findById(req.params.id);
+  const record = await Record.findById(req.params.id, req.user.tenant_id);
 
   if (!record) {
     return next(new AppError('Record not found', 404));
   }
 
-  await Record.softDelete(req.params.id);
-  await createAuditLog(req.user.id, 'DELETE', 'financial_records', req.params.id, { deleted: true });
+  await Record.softDelete(req.params.id, req.user.tenant_id);
+  await createAuditLog(req.user.id, req.user.tenant_id, 'DELETE', 'financial_records', req.params.id, { deleted: true });
 
   res.json({
     status: 'success',
@@ -105,8 +106,8 @@ export const deleteRecord = asyncHandler(async (req, res, next) => {
 // @desc    Get dashboard summary
 // @route   GET /api/v1/records/dashboard
 export const getDashboardSummary = asyncHandler(async (req, res, next) => {
-  const summary = await Record.getSummary();
-  const categoryTotals = await Record.getCategoryTotals();
+  const summary = await Record.getSummary(req.user.tenant_id);
+  const categoryTotals = await Record.getCategoryTotals(req.user.tenant_id);
 
   res.json({
     status: 'success',
@@ -124,9 +125,10 @@ export const getAuditLogs = asyncHandler(async (req, res, next) => {
     SELECT a.*, u.username 
     FROM audit_logs a
     LEFT JOIN users u ON a.user_id = u.id
+    WHERE a.tenant_id = ?
     ORDER BY a.timestamp DESC
     LIMIT 50
-  `);
+  `, [req.user.tenant_id]);
 
   res.json({
     status: 'success',
