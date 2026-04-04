@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { errorHandler, notFound } from './middlewares/errorMiddleware.js';
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.get('/', (req, res) => {
 });
 
 // Route Mounts will go here
+app.use('/api/v1/auth', authRoutes);
 
 
 // Error Handling Middleware
