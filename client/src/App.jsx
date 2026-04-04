@@ -32,8 +32,8 @@ function App() {
     username: '', 
     email: '', 
     password: '', 
-    organization: 'Zorvyn Headquarters', 
-    role: 'Admin' 
+    organization: '', 
+    role: 'Viewer' 
   });
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
@@ -233,18 +233,42 @@ function App() {
             
             <form onSubmit={handleAuth} className="minimal-form">
               <label>Identity Email</label>
-              <input type="email" value={authForm.email} onChange={e => setAuthForm({...authForm, email: e.target.value})} required />
+              <input 
+                type="email" 
+                value={authForm.email} 
+                onChange={e => setAuthForm({...authForm, email: e.target.value})} 
+                placeholder="e.g. admin@zorvyn.com"
+                required 
+              />
               
               <label>Secure Access Password</label>
-              <input type="password" value={authForm.password} onChange={e => setAuthForm({...authForm, password: e.target.value})} required />
+              <input 
+                type="password" 
+                value={authForm.password} 
+                onChange={e => setAuthForm({...authForm, password: e.target.value})} 
+                placeholder="••••••••"
+                required 
+              />
               
               {!isLogin && (
                 <>
                   <label>Identifier ID (Username)</label>
-                  <input type="text" value={authForm.username} onChange={e => setAuthForm({...authForm, username: e.target.value})} required />
+                  <input 
+                    type="text" 
+                    value={authForm.username} 
+                    onChange={e => setAuthForm({...authForm, username: e.target.value})} 
+                    placeholder="Choose a unique handle"
+                    required 
+                  />
                   
                   <label>Organization Domain</label>
-                  <input type="text" value={authForm.organization} onChange={e => setAuthForm({...authForm, organization: e.target.value})} required />
+                  <input 
+                    type="text" 
+                    value={authForm.organization} 
+                    onChange={e => setAuthForm({...authForm, organization: e.target.value})} 
+                    placeholder="e.g. Acme Corp"
+                    required 
+                  />
                 </>
               )}
               
