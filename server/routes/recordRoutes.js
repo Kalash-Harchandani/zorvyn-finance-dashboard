@@ -4,7 +4,8 @@ import {
   getRecords, 
   updateRecord, 
   deleteRecord,
-  getDashboardSummary
+  getDashboardSummary,
+  getAuditLogs
 } from '../controllers/recordController.js';
 import { requireAuth, checkPermissions } from '../middlewares/authMiddleware.js';
 
