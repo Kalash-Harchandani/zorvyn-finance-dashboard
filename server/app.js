@@ -25,8 +25,8 @@ app.get('/', (req, res) => {
 });
 
 // Route Mounts will go here
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/records', recordRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/records', recordRoutes);
 
 // Error Handling Middleware
 app.use(notFound);
