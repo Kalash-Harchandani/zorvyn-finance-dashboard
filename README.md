@@ -10,14 +10,34 @@
 
 ---
 
-## 🚀 Key Features
+## 🚀 Completed Deliverables
 
-- **🏢 Multi-Tenant Architecture**: Strict data isolation between organizations (tenants).
-- **🔐 Granular RBAC**: Dynamic Role-Based Access Control managed via database permissions.
-- **📜 Audit Transparency**: Comprehensive logging of all financial modifications for compliance.
-- **📊 Real-time Analytics**: Instant financial summaries including Net Balance, Income, and Expense tracking.
-- **👥 Personnel Management**: Administrator-level controls for provisioning and managing team members.
-- **🛠️ Dockerized Environment**: Seamless deployment with pre-configured container orchestration.
+### 🏗️ Backend Core & Architecture
+- **Modular REST API**: Built with a scalable architecture following the **Controller-Service-Model** pattern.
+- **Clean Separation of Concerns**: Distinct layers for routes, controllers, business logic (services), and data models.
+- **Persistent Storage**: Integrated with **MySQL** for robust data persistence and schema integrity.
+- **Scalable Structure**: Optimized for enterprise-level data handling and easy feature expansion.
+
+### 🔐 Security & Access Control
+- **Granular RBAC**: Dynamic Role-Based Access Control (Super Admin, Admin, Accountant, Auditor, Viewer).
+- **Multi-Tenancy Support**: Strict **Organization-Based Data Isolation**, ensuring users only see data belonging to their tenant.
+- **JWT Authentication**: Secure stateless authentication using JSON Web Tokens.
+- **Middleware-Based Authorization**: API-level protection to prevent unauthorized actions and data leaks.
+- **Input Validation**: Comprehensive sanitization and validation across all API endpoints.
+
+### 💰 Financial Management & Ledger
+- **Full CRUD Operations**: Complete control over financial records (Income and Expense tracking).
+- **Structured Ledger System**: Organization-specific financial tracking with precision decimal handling.
+- **Audit Trail**: Real-time logging of all `CREATE`, `UPDATE`, and `DELETE` operations for compliance and transparency.
+- **Dashboard Analytics APIs**:
+    - Aggregated totals for Income, Expenses, and Net Balance.
+    - Category-wise financial breakdowns.
+    - Retrieval of recent transactions for operational oversight.
+
+### 👥 User & Organization Management
+- **Organization Provisioning**: Ability to create new tenant workspaces during registration.
+- **Team Management**: Super Admin and Admin tools for inviting team members and assigning roles.
+- **Seeded Demo Environment**: Pre-configured test accounts for instant feature exploration.
 
 ---
 
@@ -37,7 +57,7 @@ graph TD
 
 ## 🛡️ Role-Based Access Control (RBAC) Matrix
 
-| Role | Dashboard | Records (Read) | Records (Write) | Audit Logs | Team Management |
+| Role | Dashboard | Records (Read) | Records (Write/Edit) | Audit Logs | Team Management |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Super Admin** | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Admin** | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -49,10 +69,10 @@ graph TD
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React, Axios for API orchestration, Vanilla CSS (Premium Aesthetics).
-- **Backend**: Node.js & Express.js (ES Modules), Raw MySQL queries for performance.
-- **Security**: JWT (JsonWebToken) Auth, Bcrypt password hashing.
-- **Infrastructure**: Docker & Docker Compose, Vercel (Front-end), AWS EC2 (Back-end).
+- **Frontend**: React (Hooks, Context API), AxiOS, Vanilla CSS (Modern Enterprise UI).
+- **Backend**: Node.js, Express.js (ES Modules), MySQL (raw performance queries).
+- **Security**: JWT, Bcrypt.js, custom Auth Middleware.
+- **Infrastructure**: Docker, AWS EC2, Vercel.
 
 ---
 
@@ -60,7 +80,7 @@ graph TD
 
 ### 1. Prerequisites
 - Docker & Docker Compose
-- Node.js v18+ (for local development)
+- Node.js v18+
 
 ### 2. Environment Configuration
 Create a `.env` file in the `server/` directory:
@@ -75,35 +95,26 @@ NODE_ENV=development
 ```
 
 ### 3. Quick Start (Docker)
-Bootstrap the entire environment with a single command:
 ```bash
 docker-compose up --build
 ```
 
-### 4. Local Development
-**Server Setup:**
+### 4. Seed Database
+To initialize the schema and roles:
 ```bash
 cd server
-npm install
-npm run init-db  # Initializes tables and seeds default roles/users
-npm run dev
-```
-
-**Client Setup:**
-```bash
-cd client
-npm install
-npm start
+npm run init-db
 ```
 
 ---
 
-## 🔐 Default Credentials (Test Environment)
-| Identity | Password |
-| :--- | :--- |
-| `superadmin@zorvyn.com` | `password123` |
-| `accountant@zorvyn.com` | `password123` |
-| `auditor@zorvyn.com` | `password123` |
+## 🔐 Default Credentials (Demo Access)
+| Identity | Password | Role |
+| :--- | :--- | :--- |
+| `superadmin@zorvyn.com` | `password123` | Super Admin |
+| `accountant@zorvyn.com` | `password123` | Accountant |
+| `auditor@zorvyn.com` | `password123` | Auditor |
+| `viewer@zorvyn.com` | `password123` | Viewer |
 
 ---
 
@@ -111,4 +122,5 @@ npm start
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-*Developed by the Zorvyn Engineering Team.*
+**Developed by Kalash Harchandani**  
+[GitHub Profile](https://github.com/Kalash-Harchandani) | [LinkedIn](https://linkedin.com/in/kalash-kt20)
