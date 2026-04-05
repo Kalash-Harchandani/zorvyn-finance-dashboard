@@ -314,7 +314,7 @@ function App() {
           </div>
           <div className="footer-right">
             <a href="https://github.com/Kalash-Harchandani/zorvyn-finance-dashboard" target="_blank" rel="noopener noreferrer" className="footer-link">GitHub Repository</a>
-            <a href="https://linkedin.com/in/kalash-harchandani" target="_blank" rel="noopener noreferrer" className="footer-link">LinkedIn Profile</a>
+            <a href="https://linkedin.com/in/kalash-kt20" target="_blank" rel="noopener noreferrer" className="footer-link">LinkedIn Profile</a>
           </div>
         </footer>
       </div>
