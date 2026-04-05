@@ -108,8 +108,15 @@ export const deleteRecord = asyncHandler(async (req, res, next) => {
 // @desc    Get dashboard summary
 // @route   GET /api/records/dashboard
 export const getDashboardSummary = asyncHandler(async (req, res, next) => {
-  const summary = await Record.getSummary(req.user.tenant_id);
-  const categoryTotals = await Record.getCategoryTotals(req.user.tenant_id);
+  const filters = {
+    category: req.query.category,
+    search: req.query.search,
+    startDate: req.query.startDate,
+    endDate: req.query.endDate
+  };
+
+  const summary = await Record.getSummary(req.user.tenant_id, filters);
+  const categoryTotals = await Record.getCategoryTotals(req.user.tenant_id, filters);
 
   res.json({
     status: 'success',

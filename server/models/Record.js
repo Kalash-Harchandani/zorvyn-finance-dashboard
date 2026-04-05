@@ -92,14 +92,22 @@ class Record {
   }
 
   // Dashboard Aggregations
-  static async getSummary(tenant_id) {
-    const [rows] = await db.query(`
+  static async getSummary(tenant_id, filters = {}) {
+    let query = `
       SELECT 
         SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income,
         SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as total_expense
       FROM financial_records
       WHERE tenant_id = ? AND deleted_at IS NULL
-    `, [tenant_id]);
+    `;
+    const params = [tenant_id];
+
+    if (filters.category) { query += ` AND category LIKE ?`; params.push(`%${filters.category}%`); }
+    if (filters.search) { query += ` AND notes LIKE ?`; params.push(`%${filters.search}%`); }
+    if (filters.startDate) { query += ` AND date >= ?`; params.push(filters.startDate); }
+    if (filters.endDate) { query += ` AND date <= ?`; params.push(filters.endDate); }
+
+    const [rows] = await db.query(query, params);
     
     const income = rows[0].total_income || 0;
     const expense = rows[0].total_expense || 0;
@@ -110,13 +118,22 @@ class Record {
     };
   }
 
-  static async getCategoryTotals(tenant_id) {
-    const [rows] = await db.query(`
+  static async getCategoryTotals(tenant_id, filters = {}) {
+    let query = `
       SELECT category, type, SUM(amount) as total
       FROM financial_records
       WHERE tenant_id = ? AND deleted_at IS NULL
-      GROUP BY category, type
-    `, [tenant_id]);
+    `;
+    const params = [tenant_id];
+
+    if (filters.category) { query += ` AND category LIKE ?`; params.push(`%${filters.category}%`); }
+    if (filters.search) { query += ` AND notes LIKE ?`; params.push(`%${filters.search}%`); }
+    if (filters.startDate) { query += ` AND date >= ?`; params.push(filters.startDate); }
+    if (filters.endDate) { query += ` AND date <= ?`; params.push(filters.endDate); }
+
+    query += ` GROUP BY category, type`;
+
+    const [rows] = await db.query(query, params);
     return rows;
   }
 }
