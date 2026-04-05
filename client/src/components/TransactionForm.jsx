@@ -1,13 +1,15 @@
 import React from 'react';
 
-const TransactionForm = ({ formData, setFormData, onSubmit, userRole }) => {
+const TransactionForm = ({ formData, setFormData, onSubmit, userRole, editingRecord, onCancel }) => {
   const isDisabled = ['Viewer', 'Auditor'].includes(userRole);
+  const isEditing = !!editingRecord;
 
   return (
-    <div className="card-container">
+    <div className="card-container" style={{ border: isEditing ? '2px solid #4f46e5' : 'none shadow' }}>
       <header className="section-header">
-        <h3>Record Entry</h3>
+        <h3>{isEditing ? 'Amend Journal Entry' : 'Record Entry'}</h3>
         {isDisabled && <span className="badge badge-expense">READ-ONLY ACCESS</span>}
+        {isEditing && <span className="badge badge-income">EDIT MODE</span>}
       </header>
 
       {isDisabled && (
@@ -70,9 +72,22 @@ const TransactionForm = ({ formData, setFormData, onSubmit, userRole }) => {
           disabled={isDisabled}
         />
 
-        <button type="submit" className="btn-primary" style={{width: '100%'}} disabled={isDisabled}>
-          {isDisabled ? 'Submission Locked' : 'Execute Record'}
-        </button>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button type="submit" className="btn-primary" style={{flex: 1}} disabled={isDisabled}>
+            {isDisabled ? 'Submission Locked' : (isEditing ? 'Update Entry' : 'Execute Record')}
+          </button>
+          
+          {isEditing && (
+            <button 
+              type="button" 
+              className="menu-item" 
+              onClick={onCancel}
+              style={{ border: '1px solid #ddd', padding: '0 1.5rem' }}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

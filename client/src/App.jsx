@@ -27,6 +27,7 @@ function App() {
   const [records, setRecords] = useState([]);
   const [summary, setSummary] = useState({ total_income: 0, total_expense: 0, net_balance: 0 });
   const [auditLogs, setAuditLogs] = useState([]);
+  const [editingRecord, setEditingRecord] = useState(null);
   const [formData, setFormData] = useState({ date: new Date().toISOString().split('T')[0], category: 'General', type: 'expense', amount: '', notes: '' });
   const [authForm, setAuthForm] = useState({ 
     username: '', 
@@ -129,8 +130,12 @@ function App() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch(`${API_BASE}/records`, {
-        method: 'POST',
+      const isEditing = !!editingRecord;
+      const url = isEditing ? `${API_BASE}/records/${editingRecord.id}` : `${API_BASE}/records`;
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -140,14 +145,32 @@ function App() {
       
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'Failed to record transaction');
+        throw new Error(data.error || `Failed to ${isEditing ? 'update' : 'record'} transaction`);
       }
 
       setFormData({ date: new Date().toISOString().split('T')[0], category: 'General', type: 'expense', amount: '', notes: '' });
+      setEditingRecord(null);
       fetchData();
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const handleEditClick = (record) => {
+    setEditingRecord(record);
+    setFormData({
+      date: new Date(record.date).toISOString().split('T')[0],
+      category: record.category,
+      type: record.type,
+      amount: record.amount,
+      notes: record.notes || ''
+    });
+    setActiveTab('overview'); // Ensure we are on the form tab
+  };
+
+  const handleCancelEdit = () => {
+    setEditingRecord(null);
+    setFormData({ date: new Date().toISOString().split('T')[0], category: 'General', type: 'expense', amount: '', notes: '' });
   };
 
   const handleDeleteTransaction = async (id) => {
@@ -316,6 +339,8 @@ function App() {
                   setFormData={setFormData} 
                   onSubmit={handleAddTransaction} 
                   userRole={user?.role}
+                  editingRecord={editingRecord}
+                  onCancel={handleCancelEdit}
                 />
                 
                 <div className="card-container">
@@ -325,6 +350,7 @@ function App() {
                   <TransactionTable 
                     records={records} 
                     onDelete={handleDeleteTransaction} 
+                    onEdit={handleEditClick}
                     userRole={user?.role} 
                   />
                 </div>
@@ -340,6 +366,7 @@ function App() {
               <TransactionTable 
                 records={records} 
                 onDelete={handleDeleteTransaction} 
+                onEdit={handleEditClick}
                 userRole={user?.role} 
               />
             </div>

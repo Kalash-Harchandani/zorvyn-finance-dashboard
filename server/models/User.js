@@ -7,7 +7,7 @@ class User {
        FROM users u
        LEFT JOIN roles r ON u.role_id = r.id 
        LEFT JOIN tenants t ON u.tenant_id = t.id
-       WHERE u.email = ?`, 
+       WHERE u.email = ?`,
       [email]
     );
     return rows[0];
@@ -19,7 +19,7 @@ class User {
        FROM users u
        LEFT JOIN roles r ON u.role_id = r.id 
        LEFT JOIN tenants t ON u.tenant_id = t.id
-       WHERE u.id = ?`, 
+       WHERE u.id = ?`,
       [id]
     );
     return rows[0];

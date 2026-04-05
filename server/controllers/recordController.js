@@ -12,7 +12,7 @@ const createAuditLog = async (userId, tenantId, action, targetTable, targetId, d
 };
 
 // @desc    Create a new record
-// @route   POST /api/v1/records
+// @route   POST /api/records
 export const createRecord = asyncHandler(async (req, res, next) => {
   const { amount, type, category, date, notes } = req.body;
 
@@ -39,7 +39,7 @@ export const createRecord = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Get all records with pagination and filters
-// @route   GET /api/v1/records
+// @route   GET /api/records
 export const getRecords = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 20;
@@ -64,7 +64,7 @@ export const getRecords = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Update a record
-// @route   PUT /api/v1/records/:id
+// @route   PUT /api/records/:id
 export const updateRecord = asyncHandler(async (req, res, next) => {
   const record = await Record.findById(req.params.id, req.user.tenant_id);
 
@@ -86,7 +86,7 @@ export const updateRecord = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Delete a record (Soft Delete)
-// @route   DELETE /api/v1/records/:id
+// @route   DELETE /api/records/:id
 export const deleteRecord = asyncHandler(async (req, res, next) => {
   const record = await Record.findById(req.params.id, req.user.tenant_id);
 
@@ -104,7 +104,7 @@ export const deleteRecord = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Get dashboard summary
-// @route   GET /api/v1/records/dashboard
+// @route   GET /api/records/dashboard
 export const getDashboardSummary = asyncHandler(async (req, res, next) => {
   const summary = await Record.getSummary(req.user.tenant_id);
   const categoryTotals = await Record.getCategoryTotals(req.user.tenant_id);
@@ -119,7 +119,7 @@ export const getDashboardSummary = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Get audit logs
-// @route   GET /api/v1/records/audit-logs
+// @route   GET /api/records/audit-logs
 export const getAuditLogs = asyncHandler(async (req, res, next) => {
   const [rows] = await db.query(`
     SELECT a.*, u.username 

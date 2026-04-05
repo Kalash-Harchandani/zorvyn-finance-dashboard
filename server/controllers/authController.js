@@ -7,7 +7,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/AppError.js';
 
 // @desc    Register a new user & create a new Organization
-// @route   POST /api/v1/auth/register
+// @route   POST /api/auth/register
 // @access  Public
 export const registerUser = asyncHandler(async (req, res, next) => {
   const { username, email, password, organizationName } = req.body;
@@ -74,7 +74,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Auth user & get token
-// @route   POST /api/v1/auth/login
+// @route   POST /api/auth/login
 // @access  Public
 export const loginUser = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
@@ -104,7 +104,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Add a team member to the current tenant
-// @route   POST /api/v1/auth/team
+// @route   POST /api/auth/team
 // @access  Private (Admin/SuperAdmin)
 export const createTeamMember = asyncHandler(async (req, res, next) => {
   const { username, email, password, roleName } = req.body;
@@ -151,7 +151,7 @@ export const createTeamMember = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Get all team members for the current tenant
-// @route   GET /api/v1/auth/team
+// @route   GET /api/auth/team
 // @access  Private (Admin/Auditor)
 export const getTeamMembers = asyncHandler(async (req, res, next) => {
   const [rows] = await db.query(

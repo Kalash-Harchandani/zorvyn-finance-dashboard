@@ -123,7 +123,7 @@ const initDb = async () => {
         FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
       );
     `);
-    
+
     console.log('✅ Tables created successfully');
 
     // Default Roles
@@ -180,13 +180,13 @@ const initDb = async () => {
     for (const [roleName, actions] of Object.entries(mappings)) {
       const [r] = await connection.query('SELECT id FROM roles WHERE name = ?', [roleName]);
       if (r.length === 0) continue;
-      
+
       const roleId = r[0].id;
 
       for (const action of actions) {
         const [p] = await connection.query('SELECT id FROM permissions WHERE action = ?', [action]);
         if (p.length > 0) {
-           await connection.query('INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)', [roleId, p[0].id]);
+          await connection.query('INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)', [roleId, p[0].id]);
         }
       }
     }
@@ -209,12 +209,12 @@ const initDb = async () => {
         await connection.query(
           `INSERT INTO users (username, email, password_hash, role_id, tenant_id) 
            VALUES (?, ?, ?, ?, ?) 
-           ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), role_id = VALUES(role_id), tenant_id = VALUES(tenant_id)`, 
+           ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), role_id = VALUES(role_id), tenant_id = VALUES(tenant_id)`,
           [username, email, hashedPassword, role[0].id, defaultTenantId]
         );
       }
     }
-    
+
     console.log('✅ Default Organization: Zorvyn Headquarters seeded');
     console.log('✅ Test users seeded (Linked to Zorvyn Headquarters)');
     console.log('   - superadmin@zorvyn.com');
