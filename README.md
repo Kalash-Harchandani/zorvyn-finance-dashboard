@@ -1,4 +1,6 @@
 # Zorvyn Finance Dashboard
+![Untitled design](https://github.com/user-attachments/assets/54ee314e-34e3-4abc-84d4-38491d4000bc)
+
 
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![MySQL](https://img.shields.io/badge/MySQL-005C84?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
