@@ -45,9 +45,17 @@ function App() {
     if (!token) return;
     try {
       const headers = { 'Authorization': `Bearer ${token}` };
-      
-      const recRes = await fetch(`${API_BASE}/records`, { headers });
-      const sumRes = await fetch(`${API_BASE}/records/summary`, { headers });
+      const queryParams = new URLSearchParams();
+      if (filters.type) queryParams.append('type', filters.type);
+      if (filters.category) queryParams.append('category', filters.category);
+      if (filters.search) queryParams.append('search', filters.search);
+      if (filters.startDate) queryParams.append('startDate', filters.startDate);
+      if (filters.endDate) queryParams.append('endDate', filters.endDate);
+
+      const [recRes, sumRes] = await Promise.all([
+        fetch(`${API_BASE}/records?${queryParams.toString()}`, { headers }),
+        fetch(`${API_BASE}/records/summary?${queryParams.toString()}`, { headers })
+      ]);
 
       const recData = await recRes.json();
       const sumData = await sumRes.json();
@@ -62,7 +70,19 @@ function App() {
       console.error(err);
       if (err.status === 401) handleLogout();
     }
-  }, [token]);
+  }, [token, filters]);
+
+  const handleFilterChange = (name, value) => {
+    setFilters(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleApplyFilters = () => {
+    fetchData();
+  };
+
+  const handleResetFilters = () => {
+    setFilters({ type: '', category: '', search: '', startDate: '', endDate: '' });
+  };
 
   const fetchAuditLogs = useCallback(async () => {
     if (!token || !['Super Admin', 'Admin', 'Auditor'].includes(user?.role)) return;
