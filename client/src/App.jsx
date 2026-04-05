@@ -193,18 +193,18 @@ function App() {
     return (
       <div className="landing-container">
         <div className="landing-grid">
-          <div style={{padding: '4rem', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-            <h1 style={{fontSize: '3rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.03em'}}>Zorvyn Finance</h1>
-            <p style={{fontSize: '1.1rem', color: '#666', maxWidth: '500px', marginBottom: '1.5rem'}}>
+          <div style={{padding: '2rem 4rem', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+            <h1 style={{fontSize: '3rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.03em'}}>Zorvyn Finance</h1>
+            <p style={{fontSize: '1.1rem', color: '#666', maxWidth: '500px', marginBottom: '1rem'}}>
               Secure, enterprise-grade multi-tenant financial ledger. Strict role-based access control and comprehensive audit transparency.
             </p>
 
             <div style={{
               background: '#eef2ff', 
               border: '1px solid #c7d2fe', 
-              padding: '1.25rem', 
+              padding: '1rem 1.25rem', 
               borderRadius: 'var(--radius-md)', 
-              marginBottom: '2.5rem', 
+              marginBottom: '1.5rem', 
               color: '#3730a3',
               fontSize: '0.85rem',
               lineHeight: '1.6',
