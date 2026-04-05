@@ -158,7 +158,14 @@ body {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.grid-right {
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
 }
 
@@ -167,19 +174,47 @@ body {
   background: var(--bg-white);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  padding: 2rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.trend-card {
+  min-height: 400px;
 }
 
 .section-header {
-  border-bottom: 1px solid var(--border-light);
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-light);
 }
 
-.section-header h3 { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.section-header h3 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-subtle);
+  border-color: var(--text-muted);
+}
 
 .enterprise-table {
   width: 100%;
@@ -368,5 +403,26 @@ body {
   gap: 0.75rem;
   min-width: 200px;
 }
+
+/* Trend Chart Specifics */
+.chart-wrapper {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-wrapper svg circle {
+  cursor: pointer;
+  transition: r 0.2s ease, filter 0.2s ease;
+}
+
+.chart-wrapper svg circle:hover {
+  r: 6;
+  filter: brightness(1.2);
+}
+
 
 

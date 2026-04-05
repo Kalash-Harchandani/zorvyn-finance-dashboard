@@ -136,6 +136,44 @@ class Record {
     const [rows] = await db.query(query, params);
     return rows;
   }
+
+  static async getWeeklyTrend(tenant_id) {
+    const [rows] = await db.query(`
+      SELECT 
+        DATE(date) as date,
+        SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
+        SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
+      FROM financial_records
+      WHERE tenant_id = ? 
+        AND date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+        AND deleted_at IS NULL
+      GROUP BY DATE(date)
+      ORDER BY DATE(date) ASC
+    `, [tenant_id]);
+    
+    // Fill in missing days with zeros for a continuous 7-day trend
+    const trend = [];
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      
+      const dayData = rows.find(r => {
+        const rDate = new Date(r.date);
+        return rDate.toISOString().split('T')[0] === dateStr;
+      });
+
+      trend.push({
+        date: dateStr,
+        dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        income: dayData ? Number(dayData.income) : 0,
+        expense: dayData ? Number(dayData.expense) : 0
+      });
+    }
+    
+    return trend;
+  }
 }
 
 export default Record;

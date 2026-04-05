@@ -3,23 +3,24 @@ import React from 'react';
 const formatDetails = (details) => {
   if (!details) return "System metadata update - No specific notes provided.";
   
+  let data = details;
   if (typeof details === 'string') {
     try {
-      const parsed = JSON.parse(details);
-      return formatDetails(parsed);
+      data = JSON.parse(details);
     } catch {
       return details;
     }
   }
   
-  if (typeof details === 'object') {
-    if (details.amount !== undefined) {
-      return `${details.type === 'income' ? 'Income' : 'Expense'}: $${details.amount} (${details.category}) ${details.notes ? `- ${details.notes}` : ''}`;
+  if (typeof data === 'object' && data !== null) {
+    if (data.deleted === true) return "Record marked for permanent deletion";
+    if (data.amount !== undefined) {
+      return `${data.type === 'income' ? 'Income' : 'Expense'}: $${data.amount} (${data.category}) ${data.notes ? `- ${data.notes}` : ''}`;
     }
-    return JSON.stringify(details);
+    return JSON.stringify(data).replace(/[{}"]/g, '').replace(/:/g, ': ');
   }
   
-  return String(details);
+  return String(data);
 };
 
 const AuditLogView = ({ auditLogs, userRole }) => {

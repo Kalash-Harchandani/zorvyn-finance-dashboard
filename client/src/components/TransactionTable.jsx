@@ -47,20 +47,21 @@ const TransactionTable = ({ records, onDelete, onEdit, userRole }) => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '4px',
-                    padding: '4px 8px', 
+                    padding: '2px 8px', 
                     margin: '0', 
-                    fontSize: '0.75rem',
+                    fontSize: '0.7rem',
                     opacity: isAuthorized ? 1 : 0.3,
                     cursor: isAuthorized ? 'pointer' : 'not-allowed',
-                    background: '#e0e7ff',
-                    color: '#000000',
-                    border: '1px solid #c7d2fe'
+                    background: '#f1f5f9',
+                    color: '#334155',
+                    border: '1px solid #e2e8f0',
+                    boxShadow: 'none'
                   }}
                   disabled={!isAuthorized}
                   title={isAuthorized ? "Amend Record" : "Authority Level Required"}
                 >
-                  <IconEdit size={14} color="#000000" />
-                  {isAuthorized ? 'Edit' : 'Locked'}
+                  <IconEdit size={12} color="#334155" />
+                  {isAuthorized ? 'EDIT' : 'LOCKED'}
                 </button>
                 <button 
                   onClick={() => onDelete(r.id)} 
@@ -71,14 +72,15 @@ const TransactionTable = ({ records, onDelete, onEdit, userRole }) => {
                     gap: '4px',
                     padding: '4px 8px', 
                     margin: '0', 
-                    fontSize: '0.75rem',
+                    fontSize: '0.7rem',
                     opacity: canDelete ? 1 : 0.3,
-                    cursor: canDelete ? 'pointer' : 'not-allowed'
+                    cursor: canDelete ? 'pointer' : 'not-allowed',
+                    height: '24px'
                   }}
                   disabled={!canDelete}
                   title={canDelete ? "Purge Record" : "Authority Level Required"}
                 >
-                  {canDelete ? <><IconTrash size={14} color="var(--error)" /> Delete</> : 'Locked'}
+                  {canDelete ? <><IconTrash size={12} color="var(--error)" /> DELETE</> : 'LOCKED'}
                 </button>
               </td>
             </tr>

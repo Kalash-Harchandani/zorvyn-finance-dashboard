@@ -117,12 +117,14 @@ export const getDashboardSummary = asyncHandler(async (req, res, next) => {
 
   const summary = await Record.getSummary(req.user.tenant_id, filters);
   const categoryTotals = await Record.getCategoryTotals(req.user.tenant_id, filters);
+  const weeklyTrend = await Record.getWeeklyTrend(req.user.tenant_id);
 
   res.json({
     status: 'success',
     data: {
       summary,
-      categoryTotals
+      categoryTotals,
+      weeklyTrend
     }
   });
 });

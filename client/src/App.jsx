@@ -9,6 +9,7 @@ import WelcomeInfo from './components/WelcomeInfo';
 import AuditLogView from './components/AuditLogView';
 import TeamManagement from './components/TeamManagement';
 import RecordFilters from './components/RecordFilters';
+import TrendChart from './components/TrendChart';
 
 const API_BASE = process.env.REACT_APP_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5005/api' : '/api');
 
@@ -27,6 +28,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('welcome');
   const [records, setRecords] = useState([]);
   const [summary, setSummary] = useState({ total_income: 0, total_expense: 0, net_balance: 0 });
+  const [trendData, setTrendData] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
   const [editingRecord, setEditingRecord] = useState(null);
   const [formData, setFormData] = useState({ date: new Date().toISOString().split('T')[0], category: 'General', type: 'expense', amount: '', notes: '' });
@@ -65,6 +67,7 @@ function App() {
       }
       if (sumRes.ok && sumData.data && sumData.data.summary) {
         setSummary(sumData.data.summary);
+        setTrendData(sumData.data.weeklyTrend || []);
       }
     } catch (err) {
       console.error(err);
@@ -368,31 +371,37 @@ function App() {
               <StatCards summary={summary} />
               
               <div className="dashboard-grid">
-                <TransactionForm 
-                  formData={formData} 
-                  setFormData={setFormData} 
-                  onSubmit={handleAddTransaction} 
-                  userRole={user?.role}
-                  editingRecord={editingRecord}
-                  onCancel={handleCancelEdit}
-                />
+                <div className="grid-left">
+                  <TransactionForm 
+                    formData={formData} 
+                    setFormData={setFormData} 
+                    onSubmit={handleAddTransaction} 
+                    userRole={user?.role}
+                    editingRecord={editingRecord}
+                    onCancel={handleCancelEdit}
+                  />
+                </div>
                 
-                <div className="card-container">
-                  <header className="section-header">
-                    <h3>Quick Ledger</h3>
-                  </header>
-                  <RecordFilters 
-                    filters={filters} 
-                    onFilterChange={handleFilterChange} 
-                    onApply={handleApplyFilters} 
-                    onReset={handleResetFilters} 
-                  />
-                  <TransactionTable 
-                    records={records} 
-                    onDelete={handleDeleteTransaction} 
-                    onEdit={handleEditClick}
-                    userRole={user?.role} 
-                  />
+                <div className="grid-right">
+                  <div className="card-container ledger-card">
+                    <header className="section-header">
+                      <h3>Quick Ledger</h3>
+                      <button className="btn-secondary" onClick={() => setActiveTab('transactions')}>View All</button>
+                    </header>
+                    <TransactionTable 
+                      records={records.slice(0, 3)} 
+                      onDelete={handleDeleteTransaction} 
+                      onEdit={handleEditClick}
+                      userRole={user?.role} 
+                    />
+                  </div>
+
+                  <div className="card-container trend-card">
+                    <header className="section-header">
+                      <h3>7-Day Financial Trend</h3>
+                    </header>
+                    <TrendChart data={trendData} />
+                  </div>
                 </div>
               </div>
             </div>
