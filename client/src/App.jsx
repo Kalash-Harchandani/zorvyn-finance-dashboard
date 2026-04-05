@@ -191,120 +191,132 @@ function App() {
 
   if (!token) {
     return (
-      <div className="landing-grid">
-        <div style={{padding: '4rem', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-          <h1 style={{fontSize: '3rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.03em'}}>Zorvyn Finance</h1>
-          <p style={{fontSize: '1.1rem', color: '#666', maxWidth: '500px', marginBottom: '1.5rem'}}>
-            Secure, enterprise-grade multi-tenant financial ledger. Strict role-based access control and comprehensive audit transparency.
-          </p>
+      <div className="landing-container">
+        <div className="landing-grid">
+          <div style={{padding: '4rem', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+            <h1 style={{fontSize: '3rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.03em'}}>Zorvyn Finance</h1>
+            <p style={{fontSize: '1.1rem', color: '#666', maxWidth: '500px', marginBottom: '1.5rem'}}>
+              Secure, enterprise-grade multi-tenant financial ledger. Strict role-based access control and comprehensive audit transparency.
+            </p>
 
-          <div style={{
-            background: '#eef2ff', 
-            border: '1px solid #c7d2fe', 
-            padding: '1.25rem', 
-            borderRadius: 'var(--radius-md)', 
-            marginBottom: '2.5rem', 
-            color: '#3730a3',
-            fontSize: '0.85rem',
-            lineHeight: '1.6',
-            maxWidth: '600px',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-          }}>
-            <span style={{fontWeight: '800', textTransform: 'uppercase', fontSize: '0.75rem', display: 'block', marginBottom: '4px', letterSpacing: '0.05em'}}>System Guidance</span>
-            Use the <strong>Demo Matrix</strong> below to instantly explore various permission tiers. 
-            Alternatively, <strong>Create a New Workspace</strong> through the registration portal on the right to manage your own isolated organization and team members.
+            <div style={{
+              background: '#eef2ff', 
+              border: '1px solid #c7d2fe', 
+              padding: '1.25rem', 
+              borderRadius: 'var(--radius-md)', 
+              marginBottom: '2.5rem', 
+              color: '#3730a3',
+              fontSize: '0.85rem',
+              lineHeight: '1.6',
+              maxWidth: '600px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+            }}>
+              <span style={{fontWeight: '800', textTransform: 'uppercase', fontSize: '0.75rem', display: 'block', marginBottom: '4px', letterSpacing: '0.05em'}}>System Guidance</span>
+              Use the <strong>Demo Matrix</strong> below to instantly explore various permission tiers. 
+              Alternatively, <strong>Create a New Workspace</strong> through the registration portal on the right to manage your own isolated organization and team members.
+            </div>
+            
+            <div className="access-matrix">
+              <div className="matrix-tile">
+                <h5>Administrator</h5>
+                <p>Full control over teams and financial auditing.</p>
+                <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
+                  ID: <strong>superadmin@zorvyn.com</strong> | PW: <strong>password123</strong>
+                </div>
+              </div>
+              <div className="matrix-tile">
+                <h5>Accountant</h5>
+                <p>Execute and manage fiscal records and journals.</p>
+                <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
+                  ID: <strong>accountant@zorvyn.com</strong> | PW: <strong>password123</strong>
+                </div>
+              </div>
+              <div className="matrix-tile">
+                <h5>Auditor</h5>
+                <p>Read-only access to complete system audit trails.</p>
+                <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
+                  ID: <strong>auditor@zorvyn.com</strong> | PW: <strong>password123</strong>
+                </div>
+              </div>
+              <div className="matrix-tile">
+                <h5>Viewer</h5>
+                <p>High-level operational overview and summaries.</p>
+                <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
+                  ID: <strong>viewer@zorvyn.com</strong> | PW: <strong>password123</strong>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <div className="access-matrix">
-            <div className="matrix-tile">
-              <h5>Administrator</h5>
-              <p>Full control over teams and financial auditing.</p>
-              <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
-                ID: <strong>superadmin@zorvyn.com</strong> | PW: <strong>password123</strong>
-              </div>
-            </div>
-            <div className="matrix-tile">
-              <h5>Accountant</h5>
-              <p>Execute and manage fiscal records and journals.</p>
-              <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
-                ID: <strong>accountant@zorvyn.com</strong> | PW: <strong>password123</strong>
-              </div>
-            </div>
-            <div className="matrix-tile">
-              <h5>Auditor</h5>
-              <p>Read-only access to complete system audit trails.</p>
-              <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
-                ID: <strong>auditor@zorvyn.com</strong> | PW: <strong>password123</strong>
-              </div>
-            </div>
-            <div className="matrix-tile">
-              <h5>Viewer</h5>
-              <p>High-level operational overview and summaries.</p>
-              <div style={{marginTop: '10px', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--primary)'}}>
-                ID: <strong>viewer@zorvyn.com</strong> | PW: <strong>password123</strong>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="login-section">
-          <div className="card-container" style={{width: '100%', maxWidth: '380px'}}>
-            <h3 style={{marginBottom: '0.5rem'}}>{isLogin ? 'Authentication' : 'Registration'}</h3>
-            <p style={{fontSize: '0.8rem', color: '#888', marginBottom: '2rem'}}>Identify your tenant and credentials.</p>
-            
-            {error && <div className="rbac-denied" style={{marginBottom: '1.5rem'}}>{error}</div>}
-            
-            <form onSubmit={handleAuth} className="minimal-form">
-              <label>Identity Email</label>
-              <input 
-                type="email" 
-                value={authForm.email} 
-                onChange={e => setAuthForm({...authForm, email: e.target.value})} 
-                placeholder="e.g. admin@zorvyn.com"
-                required 
-              />
+          <div className="login-section">
+            <div className="card-container" style={{width: '100%', maxWidth: '380px'}}>
+              <h3 style={{marginBottom: '0.5rem'}}>{isLogin ? 'Authentication' : 'Registration'}</h3>
+              <p style={{fontSize: '0.8rem', color: '#888', marginBottom: '2rem'}}>Identify your tenant and credentials.</p>
               
-              <label>Secure Access Password</label>
-              <input 
-                type="password" 
-                value={authForm.password} 
-                onChange={e => setAuthForm({...authForm, password: e.target.value})} 
-                placeholder="••••••••"
-                required 
-              />
+              {error && <div className="rbac-denied" style={{marginBottom: '1.5rem'}}>{error}</div>}
               
-              {!isLogin && (
-                <>
-                  <label>Identifier ID (Username)</label>
-                  <input 
-                    type="text" 
-                    value={authForm.username} 
-                    onChange={e => setAuthForm({...authForm, username: e.target.value})} 
-                    placeholder="Choose a unique handle"
-                    required 
-                  />
-                  
-                  <label>Organization Domain</label>
-                  <input 
-                    type="text" 
-                    value={authForm.organization} 
-                    onChange={e => setAuthForm({...authForm, organization: e.target.value})} 
-                    placeholder="e.g. Acme Corp"
-                    required 
-                  />
-                </>
-              )}
+              <form onSubmit={handleAuth} className="minimal-form">
+                <label>Identity Email</label>
+                <input 
+                  type="email" 
+                  value={authForm.email} 
+                  onChange={e => setAuthForm({...authForm, email: e.target.value})} 
+                  placeholder="e.g. admin@zorvyn.com"
+                  required 
+                />
+                
+                <label>Secure Access Password</label>
+                <input 
+                  type="password" 
+                  value={authForm.password} 
+                  onChange={e => setAuthForm({...authForm, password: e.target.value})} 
+                  placeholder="••••••••"
+                  required 
+                />
+                
+                {!isLogin && (
+                  <>
+                    <label>Identifier ID (Username)</label>
+                    <input 
+                      type="text" 
+                      value={authForm.username} 
+                      onChange={e => setAuthForm({...authForm, username: e.target.value})} 
+                      placeholder="Choose a unique handle"
+                      required 
+                    />
+                    
+                    <label>Organization Domain</label>
+                    <input 
+                      type="text" 
+                      value={authForm.organization} 
+                      onChange={e => setAuthForm({...authForm, organization: e.target.value})} 
+                      placeholder="e.g. Acme Corp"
+                      required 
+                    />
+                  </>
+                )}
+                
+                <button type="submit" className="btn-primary" style={{width: '100%'}}>
+                  {isLogin ? 'Sign In' : 'Create Account'}
+                </button>
+              </form>
               
-              <button type="submit" className="btn-primary" style={{width: '100%'}}>
-                {isLogin ? 'Sign In' : 'Create Account'}
+              <button className="menu-item" style={{width: '100%', marginTop: '1.5rem', textAlign: 'center', fontSize: '0.8rem'}} onClick={() => setIsLogin(!isLogin)}>
+                {isLogin ? "Need a new workspace? Register here." : "Already have an account? Sign in."}
               </button>
-            </form>
-            
-            <button className="menu-item" style={{width: '100%', marginTop: '1.5rem', textAlign: 'center', fontSize: '0.8rem'}} onClick={() => setIsLogin(!isLogin)}>
-              {isLogin ? "Need a new workspace? Register here." : "Already have an account? Sign in."}
-            </button>
+            </div>
           </div>
         </div>
+        
+        <footer className="landing-footer">
+          <div className="footer-left">
+            Made by <strong>Kalash Harchandani</strong>
+          </div>
+          <div className="footer-right">
+            <a href="https://github.com/Kalash-Harchandani/zorvyn-finance-dashboard" target="_blank" rel="noopener noreferrer" className="footer-link">GitHub Repository</a>
+            <a href="https://linkedin.com/in/kalash-harchandani" target="_blank" rel="noopener noreferrer" className="footer-link">LinkedIn Profile</a>
+          </div>
+        </footer>
       </div>
     );
   }

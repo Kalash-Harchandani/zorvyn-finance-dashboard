@@ -282,3 +282,45 @@ body {
 
 .matrix-tile h5 { margin-bottom: 8px; color: var(--primary); }
 .matrix-tile p { font-size: 0.75rem; color: var(--text-dim); }
+
+/* Landing Footer Specifics */
+.landing-footer {
+  width: 100%;
+  padding: 2rem 4rem;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  margin-top: auto;
+}
+
+.footer-left {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.footer-right {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-link {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: var(--primary);
+}
+
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
