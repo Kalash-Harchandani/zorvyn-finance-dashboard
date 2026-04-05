@@ -63,6 +63,14 @@ class Record {
       query += ` AND r.notes LIKE ?`;
       params.push(`%${filters.noteSearch}%`);
     }
+    if (filters.startDate) {
+      query += ` AND r.date >= ?`;
+      params.push(filters.startDate);
+    }
+    if (filters.endDate) {
+      query += ` AND r.date <= ?`;
+      params.push(filters.endDate);
+    }
 
     query += ` ORDER BY r.date DESC LIMIT ? OFFSET ?`;
     params.push(Number(options.limit), Number(options.offset));
@@ -75,6 +83,8 @@ class Record {
     if (filters.type) { countQuery += ` AND r.type = ?`; countParams.push(filters.type); }
     if (filters.category) { countQuery += ` AND r.category LIKE ?`; countParams.push(`%${filters.category}%`); }
     if (filters.noteSearch) { countQuery += ` AND r.notes LIKE ?`; countParams.push(`%${filters.noteSearch}%`); }
+    if (filters.startDate) { countQuery += ` AND r.date >= ?`; countParams.push(filters.startDate); }
+    if (filters.endDate) { countQuery += ` AND r.date <= ?`; countParams.push(filters.endDate); }
     
     const [countRows] = await db.query(countQuery, countParams);
     

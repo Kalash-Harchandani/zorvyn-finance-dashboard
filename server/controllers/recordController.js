@@ -48,7 +48,9 @@ export const getRecords = asyncHandler(async (req, res, next) => {
   const filters = {
     type: req.query.type,
     category: req.query.category,
-    noteSearch: req.query.search
+    noteSearch: req.query.search,
+    startDate: req.query.startDate,
+    endDate: req.query.endDate
   };
 
   const { data, total } = await Record.getAll(req.user.tenant_id, filters, { limit, offset });

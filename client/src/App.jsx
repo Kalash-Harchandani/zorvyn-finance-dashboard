@@ -8,6 +8,7 @@ import TransactionTable from './components/TransactionTable';
 import WelcomeInfo from './components/WelcomeInfo';
 import AuditLogView from './components/AuditLogView';
 import TeamManagement from './components/TeamManagement';
+import RecordFilters from './components/RecordFilters';
 
 const API_BASE = process.env.REACT_APP_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5005/api' : '/api');
 
@@ -29,6 +30,7 @@ function App() {
   const [auditLogs, setAuditLogs] = useState([]);
   const [editingRecord, setEditingRecord] = useState(null);
   const [formData, setFormData] = useState({ date: new Date().toISOString().split('T')[0], category: 'General', type: 'expense', amount: '', notes: '' });
+  const [filters, setFilters] = useState({ type: '', category: '', search: '', startDate: '', endDate: '' });
   const [authForm, setAuthForm] = useState({ 
     username: '', 
     email: '', 
@@ -357,8 +359,14 @@ function App() {
                 
                 <div className="card-container">
                   <header className="section-header">
-                    <h3>Journal Entries</h3>
+                    <h3>Quick Ledger</h3>
                   </header>
+                  <RecordFilters 
+                    filters={filters} 
+                    onFilterChange={handleFilterChange} 
+                    onApply={handleApplyFilters} 
+                    onReset={handleResetFilters} 
+                  />
                   <TransactionTable 
                     records={records} 
                     onDelete={handleDeleteTransaction} 
@@ -375,6 +383,12 @@ function App() {
               <header className="section-header">
                 <h3>Master Journal</h3>
               </header>
+              <RecordFilters 
+                filters={filters} 
+                onFilterChange={handleFilterChange} 
+                onApply={handleApplyFilters} 
+                onReset={handleResetFilters} 
+              />
               <TransactionTable 
                 records={records} 
                 onDelete={handleDeleteTransaction} 
