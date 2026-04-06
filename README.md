@@ -70,3 +70,33 @@ graph TD
 | **Viewer** | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 ---
+## 🔌 API Documentation
+
+All API requests are prefixed with `/api`.
+
+### 🔐 Authentication & Authorization
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `POST` | `/auth/register` | Register new organization/admin | ❌ |
+| `POST` | `/auth/login` | Login and receive JWT | ❌ |
+
+### 💰 Financial Records
+| Method | Endpoint | Description | Permission Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/records` | Fetch all records for the organization | `read:records` |
+| `POST` | `/records` | Create a new income/expense entry | `create:records` |
+| `PUT` | `/records/:id` | Update an existing record | `update:records` |
+| `DELETE` | `/records/:id` | Remove a record | `delete:records` |
+
+### 📊 Dashboard & Analytics
+| Method | Endpoint | Description | Permission Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/records/dashboard` | Get financial overview & aggregates | `read:dashboard` |
+| `GET` | `/records/audit-logs` | Fetch system audit trails | `read:audit_logs` |
+
+### 👥 Team Management
+| Method | Endpoint | Description | Permission Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/auth/team` | List all organization members | `read:dashboard` |
+| `POST` | `/auth/team` | Add / Invite a new team member | `manage:team` |
+
